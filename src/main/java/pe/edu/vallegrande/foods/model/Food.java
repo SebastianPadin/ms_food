@@ -14,11 +14,12 @@ import java.time.LocalDate;
 @Table("Foods")
 public class Food {
     @Id
-    private Long id;
+    private Long id_food;
     private String foodType;
     private String foodBrand;
-    private String unitMeasure;
-    private String packaging;  
+    private String amount;
+    private String packaging;
+    private String unitMeasure;  
     private LocalDate entryDate;
     private String status;
 }

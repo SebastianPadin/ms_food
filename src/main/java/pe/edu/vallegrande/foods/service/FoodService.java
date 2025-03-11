@@ -45,8 +45,9 @@ public class FoodService {
                     if ("A".equals(existingFood.getStatus())) {
                         existingFood.setFoodType(food.getFoodType());
                         existingFood.setFoodBrand(food.getFoodBrand());
-                        existingFood.setUnitMeasure(food.getUnitMeasure());
-                        existingFood.setPackaging(food.getPackaging()); 
+                        existingFood.setAmount(food.getAmount());
+                        existingFood.setPackaging(food.getPackaging());
+                        existingFood.setUnitMeasure(food.getUnitMeasure()); 
                         return foodRepository.save(existingFood);
                     } else {
                         return Mono.error(new RuntimeException("Cannot edit food with inactive status"));
