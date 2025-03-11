@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @Data
 @Table("food_costs")
-public class FoodCosts {
+public class FoodCost {
     @Id
     private Long idFoodCosts;
     private String weekNumber;

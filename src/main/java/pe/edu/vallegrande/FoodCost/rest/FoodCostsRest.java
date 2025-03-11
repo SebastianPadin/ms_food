@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pe.edu.vallegrande.foods.model.FoodCosts;
-import pe.edu.vallegrande.foods.service.FoodCostsService;
+import pe.edu.vallegrande.FoodCost.model.FoodCost;
+import pe.edu.vallegrande.FoodCost.service.FoodCostsService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -22,36 +22,36 @@ public class FoodCostsRest {
     private final FoodCostsService foodCostsService;
 
     @GetMapping("actives")
-    public Flux<FoodCosts> getAllActiveCost() {
+    public Flux<FoodCost> getAllActiveCost() {
         return foodCostsService.getAllActiveCosts();
     }
 
     @GetMapping("/inactives")
-    public Flux<FoodCosts> getAllInactiveCost() {
+    public Flux<FoodCost> getAllInactiveCost() {
         return foodCostsService.getAllInactiveCosts();
     }
 
     @PostMapping
-    public Mono<FoodCosts> createFood(@RequestBody FoodCosts foodcosts) {
+    public Mono<FoodCost> createFood(@RequestBody FoodCost foodcosts) {
         return foodCostsService.createFoodCosts(foodcosts);
     }
 
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<FoodCosts>> updateFoodCosts(@PathVariable Long id, @RequestBody FoodCosts foodCosts) {
+    public Mono<ResponseEntity<FoodCost>> updateFoodCosts(@PathVariable Long id, @RequestBody FoodCost foodCosts) {
         return foodCostsService.updateFoodCosts(id, foodCosts)
                 .map(updatedFoodCosts -> ResponseEntity.ok(updatedFoodCosts))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/delete/{id}")
-    public Mono<ResponseEntity<FoodCosts>> deleteFood(@PathVariable Long id) {
+    public Mono<ResponseEntity<FoodCost>> deleteFood(@PathVariable Long id) {
         return foodCostsService.deleteFoodCost(id)
                 .map(deletedFood -> ResponseEntity.ok(deletedFood))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/restore/{id}")
-    public Mono<ResponseEntity<FoodCosts>> restoreFood(@PathVariable Long id) {
+    public Mono<ResponseEntity<FoodCost>> restoreFood(@PathVariable Long id) {
         return foodCostsService.restoreFoodCosts(id)
                 .map(restoredFood -> ResponseEntity.ok(restoredFood))
                 .defaultIfEmpty(ResponseEntity.notFound().build());

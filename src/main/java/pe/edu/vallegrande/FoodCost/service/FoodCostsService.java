@@ -2,8 +2,8 @@ package pe.edu.vallegrande.FoodCost.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import pe.edu.vallegrande.foods.model.FoodCosts;
-import pe.edu.vallegrande.foods.repository.FoodCostsRepository;
+import pe.edu.vallegrande.FoodCost.model.FoodCost;
+import pe.edu.vallegrande.FoodCost.repository.FoodCostsRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -14,19 +14,19 @@ public class FoodCostsService {
     private final FoodCostsRepository foodCostsRepository;
 
     
-    public Flux<FoodCosts> getAllActiveCosts() {
+    public Flux<FoodCost> getAllActiveCosts() {
         return foodCostsRepository.findAllByStatus("A");
     }
 
-    public Flux<FoodCosts> getAllInactiveCosts() {
+    public Flux<FoodCost> getAllInactiveCosts() {
         return foodCostsRepository.findAllByStatus("I");
     }
 
-    public Mono<FoodCosts> createFoodCosts(FoodCosts foodcosts) {
+    public Mono<FoodCost> createFoodCosts(FoodCost foodcosts) {
         return foodCostsRepository.save(foodcosts);
     }
 
-    public Mono<FoodCosts> updateFoodCosts(Long id, FoodCosts food) {
+    public Mono<FoodCost> updateFoodCosts(Long id, FoodCost food) {
         return foodCostsRepository.findById(id)
                 .flatMap(existingFoodCosts -> {
                     if ("A".equals(existingFoodCosts.getStatus())) {
@@ -49,7 +49,7 @@ public class FoodCostsService {
     }
 
     // Método para eliminar un costo de alimento lógicamente
-    public Mono<FoodCosts> deleteFoodCost(Long id) {
+    public Mono<FoodCost> deleteFoodCost(Long id) {
         return foodCostsRepository.findById(id)
                 .flatMap(existingFoodCosts -> {
                     if ("A".equals(existingFoodCosts.getStatus())) {
@@ -63,7 +63,7 @@ public class FoodCostsService {
     }
 
     // Método para restaurar el costo de alimento (cambiar estado de 'I' a 'A')
-    public Mono<FoodCosts> restoreFoodCosts(Long id) {
+    public Mono<FoodCost> restoreFoodCosts(Long id) {
         return foodCostsRepository.findById(id)
                 .flatMap(existingFoodCosts -> {
                     if ("I".equals(existingFoodCosts.getStatus())) {
