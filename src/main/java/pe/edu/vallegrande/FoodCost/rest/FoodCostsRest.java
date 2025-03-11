@@ -21,7 +21,7 @@ public class FoodCostsRest {
 
     private final FoodCostsService foodCostsService;
 
-    @GetMapping("actives")
+    @GetMapping("/actives")
     public Flux<FoodCost> getAllActiveCost() {
         return foodCostsService.getAllActiveCosts();
     }
