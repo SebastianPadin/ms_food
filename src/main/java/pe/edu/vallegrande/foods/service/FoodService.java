@@ -7,6 +7,7 @@ import pe.edu.vallegrande.foods.repository.FoodRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import pe.edu.vallegrande.foods.dto.FoodUpdateRequest;
+import pe.edu.vallegrande.foods.dto.FoodInsertRequest;
 
 @Service
 public class FoodService {
@@ -35,7 +36,13 @@ public class FoodService {
     }
 
     // Método para guardar un nuevo alimento
-    public Mono<Food> createFood(Food food) {
+    public Mono<Food> createFood(FoodInsertRequest request) {
+        Food food = new Food();
+        food.setFoodType(request.getFoodType());
+        food.setFoodBrand(request.getFoodBrand());
+        food.setAmount(request.getAmount());
+        food.setPackaging(request.getPackaging());
+        food.setUnitMeasure(request.getUnitMeasure());
         return foodRepository.save(food);
     }
 
