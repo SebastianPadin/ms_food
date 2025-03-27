@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pe.edu.vallegrande.FoodCost.model.FoodCost;
 import pe.edu.vallegrande.FoodCost.service.FoodCostsService;
+import pe.edu.vallegrande.FoodCost.dto.InsertCostRequestDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -32,8 +33,9 @@ public class FoodCostsRest {
     }
 
     @PostMapping
-    public Mono<FoodCost> createFood(@RequestBody FoodCost foodcosts) {
-        return foodCostsService.createFoodCosts(foodcosts);
+    public Mono<String> createFoodCost(@RequestBody InsertCostRequestDto dto) {
+        return foodCostsService.addFoodCost(dto)
+                .thenReturn("Registro insertado correctamente");
     }
 
     @PutMapping("/{id}")

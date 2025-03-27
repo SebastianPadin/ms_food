@@ -2,6 +2,7 @@ package pe.edu.vallegrande.FoodCost.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import pe.edu.vallegrande.FoodCost.dto.InsertCostRequestDto;
 import pe.edu.vallegrande.FoodCost.model.FoodCost;
 import pe.edu.vallegrande.FoodCost.repository.FoodCostsRepository;
 import reactor.core.publisher.Flux;
@@ -13,17 +14,22 @@ public class FoodCostsService {
 
     private final FoodCostsRepository foodCostsRepository;
 
-    
     public Flux<FoodCost> getAllActiveCosts() {
-        return foodCostsRepository.findAllByStatus("A");
+        return foodCostsRepository.findAllByStatusOrderByIdFoodCostsAsc("A");
     }
 
     public Flux<FoodCost> getAllInactiveCosts() {
-        return foodCostsRepository.findAllByStatus("I");
+        return foodCostsRepository.findAllByStatusOrderByIdFoodCostsAsc("I");
     }
 
-    public Mono<FoodCost> createFoodCosts(FoodCost foodcosts) {
-        return foodCostsRepository.save(foodcosts);
+    public Mono<Void> addFoodCost(InsertCostRequestDto dto) {
+        return foodCostsRepository.insertFoodCost(
+            dto.getWeekNumber(),
+            dto.getFoodId(),
+            dto.getGramsPerChicken(),
+            dto.getChickensCount(),
+            dto.getUnitPrice()
+        );
     }
 
     public Mono<FoodCost> updateFoodCosts(Long id, FoodCost food) {
@@ -67,7 +73,7 @@ public class FoodCostsService {
         return foodCostsRepository.findById(id)
                 .flatMap(existingFoodCosts -> {
                     if ("I".equals(existingFoodCosts.getStatus())) {
-                        existingFoodCosts.setStatus("A");  
+                        existingFoodCosts.setStatus("A");
                         return foodCostsRepository.save(existingFoodCosts);
                     } else {
                         return Mono.error(new RuntimeException("Record is already active"));
