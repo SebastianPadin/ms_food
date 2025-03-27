@@ -12,12 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 import pe.edu.vallegrande.FoodCost.model.FoodCost;
 import pe.edu.vallegrande.FoodCost.service.FoodCostsService;
 import pe.edu.vallegrande.FoodCost.dto.InsertCostRequestDto;
+import pe.edu.vallegrande.FoodCost.dto.UpdateCostRequestDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/api/food-costs")
 @RequiredArgsConstructor
+@RequestMapping("/api/food-costs")
 public class FoodCostsRest {
 
     private final FoodCostsService foodCostsService;
@@ -38,11 +39,10 @@ public class FoodCostsRest {
                 .thenReturn("Registro insertado correctamente");
     }
 
-    @PutMapping("/{id}")
-    public Mono<ResponseEntity<FoodCost>> updateFoodCosts(@PathVariable Long id, @RequestBody FoodCost foodCosts) {
-        return foodCostsService.updateFoodCosts(id, foodCosts)
-                .map(updatedFoodCosts -> ResponseEntity.ok(updatedFoodCosts))
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+    @PutMapping
+    public Mono<String> updateFoodCost(@RequestBody UpdateCostRequestDto dto) {
+        return foodCostsService.updateFoodCost(dto)
+                .thenReturn("Registro actualizado correctamente");
     }
 
     @PutMapping("/delete/{id}")

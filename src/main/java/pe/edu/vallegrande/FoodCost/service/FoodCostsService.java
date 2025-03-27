@@ -3,6 +3,7 @@ package pe.edu.vallegrande.FoodCost.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pe.edu.vallegrande.FoodCost.dto.InsertCostRequestDto;
+import pe.edu.vallegrande.FoodCost.dto.UpdateCostRequestDto;
 import pe.edu.vallegrande.FoodCost.model.FoodCost;
 import pe.edu.vallegrande.FoodCost.repository.FoodCostsRepository;
 import reactor.core.publisher.Flux;
@@ -32,27 +33,17 @@ public class FoodCostsService {
         );
     }
 
-    public Mono<FoodCost> updateFoodCosts(Long id, FoodCost food) {
-        return foodCostsRepository.findById(id)
-                .flatMap(existingFoodCosts -> {
-                    if ("A".equals(existingFoodCosts.getStatus())) {
-
-                        existingFoodCosts.setWeekNumber(food.getWeekNumber());
-                        existingFoodCosts.setFoodId(food.getFoodId());
-                        existingFoodCosts.setGramsPerChicken(food.getGramsPerChicken());
-                        existingFoodCosts.setTotalKg(food.getTotalKg());
-                        existingFoodCosts.setTotalCost(food.getTotalCost());
-                        existingFoodCosts.setStartDate(food.getStartDate());
-                        existingFoodCosts.setEndDate(food.getEndDate());
-
-                        return foodCostsRepository.save(existingFoodCosts);
-                    } else {
-                        return Mono.error(new RuntimeException(
-                                "No se pueden editar los costos de alimentos con el estado inactivo"));
-                    }
-                })
-                .switchIfEmpty(Mono.error(new RuntimeException("No se encontró el registro de costos de alimentos")));
+    public Mono<Void> updateFoodCost(UpdateCostRequestDto dto) {
+        return foodCostsRepository.updateFoodCost(
+            dto.getIdFoodCosts(),
+            dto.getWeekNumber(),
+            dto.getFoodId(),
+            dto.getGramsPerChicken(),
+            dto.getChickensCount(),
+            dto.getUnitPrice()
+        );
     }
+
 
     // Método para eliminar un costo de alimento lógicamente
     public Mono<FoodCost> deleteFoodCost(Long id) {
