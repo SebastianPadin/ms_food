@@ -12,7 +12,7 @@ public class CorsConfig {
     @Bean
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.addAllowedOrigin("https://4200-sebastianpadin-msfoodfe-ubkn43i0e6z.ws-us118.gitpod.io");
+        corsConfig.addAllowedOrigin("https://4200-vallegrande-vgwebdashbo-rhrpewu38nb.ws-us118.gitpod.io");
         corsConfig.addAllowedMethod("*");
         corsConfig.addAllowedHeader("*");
         corsConfig.setAllowCredentials(true);
