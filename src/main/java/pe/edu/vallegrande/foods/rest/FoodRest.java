@@ -15,8 +15,6 @@ import pe.edu.vallegrande.foods.model.Food;
 import pe.edu.vallegrande.foods.service.FoodService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import pe.edu.vallegrande.foods.dto.FoodUpdateRequest;
-import pe.edu.vallegrande.foods.dto.FoodInsertRequest;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -48,15 +46,13 @@ public class FoodRest {
     }
 
     @PostMapping
-    public Mono<ResponseEntity<Food>> createFood(@RequestBody FoodInsertRequest request) {
-        return foodService.createFood(request)
-                .map(food -> ResponseEntity.ok(food))
-                .defaultIfEmpty(ResponseEntity.badRequest().build());
+    public Mono<Food> createFood(@RequestBody Food food) {
+        return foodService.createFood(food);
     }
 
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<Food>> updateFood(@PathVariable Long id, @RequestBody FoodUpdateRequest foodRequest) {
-        return foodService.updateFood(id, foodRequest)
+    public Mono<ResponseEntity<Food>> updateFood(@PathVariable Long id, @RequestBody Food food) {
+        return foodService.updateFood(id, food)
                 .map(updatedFood -> ResponseEntity.ok(updatedFood))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
