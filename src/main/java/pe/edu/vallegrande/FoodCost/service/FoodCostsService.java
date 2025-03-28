@@ -25,25 +25,22 @@ public class FoodCostsService {
 
     public Mono<Void> addFoodCost(InsertCostRequestDto dto) {
         return foodCostsRepository.insertFoodCost(
-            dto.getWeekNumber(),
-            dto.getFoodId(),
-            dto.getGramsPerChicken(),
-            dto.getChickensCount(),
-            dto.getUnitPrice()
-        );
+                dto.getWeekNumber(),
+                dto.getFoodId(),
+                dto.getGramsPerChicken(),
+                dto.getChickensCount(),
+                dto.getUnitPrice());
     }
 
-    public Mono<Void> updateFoodCost(UpdateCostRequestDto dto) {
+    public Mono<Void> updateFoodCost(Integer idFoodCosts, UpdateCostRequestDto dto) {
         return foodCostsRepository.updateFoodCost(
-            dto.getIdFoodCosts(),
-            dto.getWeekNumber(),
-            dto.getFoodId(),
-            dto.getGramsPerChicken(),
-            dto.getChickensCount(),
-            dto.getUnitPrice()
-        );
+                idFoodCosts,
+                dto.getWeekNumber(),
+                dto.getFoodId(),
+                dto.getGramsPerChicken(),
+                dto.getChickensCount(),
+                dto.getUnitPrice());
     }
-
 
     // Método para eliminar un costo de alimento lógicamente
     public Mono<FoodCost> deleteFoodCost(Long id) {

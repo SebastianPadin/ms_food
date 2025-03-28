@@ -1,7 +1,8 @@
 package pe.edu.vallegrande.FoodCost.rest;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,8 +18,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/food-costs")
+@AllArgsConstructor
 public class FoodCostsRest {
 
     private final FoodCostsService foodCostsService;
@@ -39,9 +41,9 @@ public class FoodCostsRest {
                 .thenReturn("Registro insertado correctamente");
     }
 
-    @PutMapping
-    public Mono<String> updateFoodCost(@RequestBody UpdateCostRequestDto dto) {
-        return foodCostsService.updateFoodCost(dto)
+    @PutMapping("/{idFoodCosts}")
+    public Mono<String> updateFoodCost(@PathVariable Integer idFoodCosts, @RequestBody UpdateCostRequestDto dto) {
+        return foodCostsService.updateFoodCost(idFoodCosts, dto)
                 .thenReturn("Registro actualizado correctamente");
     }
 

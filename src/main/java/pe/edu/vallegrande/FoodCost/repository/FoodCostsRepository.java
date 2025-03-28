@@ -1,7 +1,6 @@
 package pe.edu.vallegrande.FoodCost.repository;
 
 import java.math.BigDecimal;
-
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
@@ -26,7 +25,7 @@ public interface FoodCostsRepository extends ReactiveCrudRepository<FoodCost, Lo
 
     @Query("CALL update_food_cost(:idFoodCosts, :weekNumber, :foodId, :gramsPerChicken, :chickensCount, :unitPrice)")
     Mono<Void> updateFoodCost(
-            String idFoodCosts,
+            Integer idFoodCosts,
             String weekNumber,
             Integer foodId,
             BigDecimal gramsPerChicken,

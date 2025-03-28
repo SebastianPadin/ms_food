@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateCostRequestDto {
-    private String idFoodCosts;
     private String weekNumber;
     private Integer foodId;
     private BigDecimal gramsPerChicken;
