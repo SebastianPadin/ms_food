@@ -1,6 +1,10 @@
 package pe.edu.vallegrande.FoodCost.rest;
 
 import lombok.AllArgsConstructor;
+
+import java.util.Collections;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,15 +40,19 @@ public class FoodCostsRest {
     }
 
     @PostMapping
-    public Mono<String> createFoodCost(@RequestBody InsertCostRequestDto dto) {
+    public Mono<ResponseEntity<Map<String, String>>> createFoodCost(@RequestBody InsertCostRequestDto dto) {
         return foodCostsService.addFoodCost(dto)
-                .thenReturn("Registro insertado correctamente");
+                .thenReturn(ResponseEntity.ok(Collections.singletonMap("message", "Registro insertado correctamente")));
     }
 
     @PutMapping("/{idFoodCosts}")
-    public Mono<String> updateFoodCost(@PathVariable Integer idFoodCosts, @RequestBody UpdateCostRequestDto dto) {
+    public Mono<ResponseEntity<Map<String, String>>> updateFoodCost(
+            @PathVariable Integer idFoodCosts,
+            @RequestBody UpdateCostRequestDto dto) {
+
         return foodCostsService.updateFoodCost(idFoodCosts, dto)
-                .thenReturn("Registro actualizado correctamente");
+                .thenReturn(
+                        ResponseEntity.ok(Collections.singletonMap("message", "Registro actualizado correctamente")));
     }
 
     @PutMapping("/delete/{id}")
