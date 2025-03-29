@@ -2,6 +2,8 @@ package pe.edu.vallegrande.foods.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pe.edu.vallegrande.foods.dto.FoodInsertRequest;
+import pe.edu.vallegrande.foods.dto.FoodUpdateRequest;
 import pe.edu.vallegrande.foods.model.Food;
 import pe.edu.vallegrande.foods.repository.FoodRepository;
 import reactor.core.publisher.Flux;
@@ -34,26 +36,30 @@ public class FoodService {
     }
 
     // Método para guardar un nuevo alimento
-    public Mono<Food> createFood(Food food) {
+    public Mono<Food> createFood(FoodInsertRequest request) {
+        Food food = new Food();
+        food.setFoodType(request.getFoodType());
+        food.setFoodBrand(request.getFoodBrand());
+        food.setAmount(request.getAmount());
+        food.setPackaging(request.getPackaging());
+        food.setUnitMeasure(request.getUnitMeasure());
         return foodRepository.save(food);
     }
 
     // Método para actualizar un alimento
-    public Mono<Food> updateFood(Long id, Food food) {
+    public Mono<Food> updateFood(Long id, FoodUpdateRequest foodRequest) {
         return foodRepository.findById(id)
                 .flatMap(existingFood -> {
                     if ("A".equals(existingFood.getStatus())) {
-                        existingFood.setFoodType(food.getFoodType());
-                        existingFood.setFoodBrand(food.getFoodBrand());
-                        existingFood.setAmount(food.getAmount());
-                        existingFood.setPackaging(food.getPackaging());
-                        existingFood.setUnitMeasure(food.getUnitMeasure()); 
+                        existingFood.setFoodType(foodRequest.getFoodType());
+                        existingFood.setFoodBrand(foodRequest.getFoodBrand());
+                        existingFood.setAmount(foodRequest.getAmount());
+                        existingFood.setPackaging(foodRequest.getPackaging());
+                        existingFood.setUnitMeasure(foodRequest.getUnitMeasure());
                         return foodRepository.save(existingFood);
-                    } else {
-                        return Mono.error(new RuntimeException("Cannot edit food with inactive status"));
                     }
-                })
-                .switchIfEmpty(Mono.error(new RuntimeException("Food not found")));
+                    return Mono.error(new RuntimeException("No se puede editar un alimento con estado inactivo"));
+                });
     }
 
     // Método para eliminar un alimento lógicamente
@@ -61,7 +67,7 @@ public class FoodService {
         return foodRepository.findById(id)
                 .flatMap(existingFood -> {
                     if ("A".equals(existingFood.getStatus())) {
-                        existingFood.setStatus("I");  
+                        existingFood.setStatus("I");
                         return foodRepository.save(existingFood);
                     } else {
                         return Mono.error(new RuntimeException("Food is already inactive"));
@@ -75,7 +81,7 @@ public class FoodService {
         return foodRepository.findById(id)
                 .flatMap(existingFood -> {
                     if ("I".equals(existingFood.getStatus())) {
-                        existingFood.setStatus("A");  
+                        existingFood.setStatus("A");
                         return foodRepository.save(existingFood);
                     } else {
                         return Mono.error(new RuntimeException("Food is already active"));
