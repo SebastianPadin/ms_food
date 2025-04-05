@@ -2,8 +2,6 @@ package pe.edu.vallegrande.FoodCost.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import pe.edu.vallegrande.FoodCost.dto.transfer.UpdateCostRequestDto;
 import pe.edu.vallegrande.FoodCost.model.FoodCost;
 import pe.edu.vallegrande.FoodCost.repository.FoodCostsRepository;
 import reactor.core.publisher.Flux;
@@ -21,16 +19,6 @@ public class FoodCostsService {
 
     public Flux<FoodCost> getAllInactiveCosts() {
         return foodCostsRepository.findAllByStatusOrderByIdFoodCostsAsc("I");
-    }
-
-    public Mono<Void> updateFoodCost(Integer idFoodCosts, UpdateCostRequestDto dto) {
-        return foodCostsRepository.updateFoodCost(
-                idFoodCosts,
-                dto.getWeekNumber(),
-                dto.getFoodId(),
-                dto.getGramsPerChicken(),
-                dto.getChickensCount(),
-                dto.getUnitPrice());
     }
 
     // Método para eliminar un costo de alimento lógicamente

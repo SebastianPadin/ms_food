@@ -11,7 +11,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import lombok.RequiredArgsConstructor;
 import pe.edu.vallegrande.FoodCost.dto.reception.FoodDto;
 import pe.edu.vallegrande.FoodCost.dto.reception.HensDto;
-import pe.edu.vallegrande.FoodCost.dto.transfer.InsertCostRequestDto;
+import pe.edu.vallegrande.FoodCost.dto.transfer.FoodCostRequestDto;
 import pe.edu.vallegrande.FoodCost.model.FoodCost;
 import pe.edu.vallegrande.FoodCost.repository.FoodCostsRepository;
 import reactor.core.publisher.Mono;
@@ -29,7 +29,7 @@ public class InsertCostService {
     @Value("${external.hens-service-url}")
     private String hensServiceUrl;
 
-    public Mono<Void> addFoodCost(InsertCostRequestDto request) {
+    public Mono<Void> addFoodCost(FoodCostRequestDto request) {
 
         Mono<FoodDto> foodMono = webClient.get()
                 .uri(foodServiceUrl)

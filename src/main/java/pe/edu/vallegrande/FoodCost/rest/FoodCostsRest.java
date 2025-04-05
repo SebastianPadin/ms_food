@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import pe.edu.vallegrande.FoodCost.model.FoodCost;
 import pe.edu.vallegrande.FoodCost.service.FoodCostsService;
 import pe.edu.vallegrande.FoodCost.service.InsertCostService;
-import pe.edu.vallegrande.FoodCost.dto.transfer.InsertCostRequestDto;
-import pe.edu.vallegrande.FoodCost.dto.transfer.UpdateCostRequestDto;
+import pe.edu.vallegrande.FoodCost.service.UpdateCostService;
+import pe.edu.vallegrande.FoodCost.dto.transfer.FoodCostRequestDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -30,6 +30,7 @@ public class FoodCostsRest {
 
     private final FoodCostsService foodCostsService;
     private final InsertCostService insertCostService;
+    private final UpdateCostService updateCostService;
 
 
     @GetMapping("/actives")
@@ -43,17 +44,17 @@ public class FoodCostsRest {
     }
 
     @PostMapping
-    public Mono<ResponseEntity<Map<String, String>>> createFoodCost(@RequestBody InsertCostRequestDto dto) {
+    public Mono<ResponseEntity<Map<String, String>>> createFoodCost(@RequestBody FoodCostRequestDto dto) {
         return insertCostService.addFoodCost(dto)
                 .thenReturn(ResponseEntity.ok(Collections.singletonMap("message", "Registro insertado correctamente")));
     }
 
     @PutMapping("/{idFoodCosts}")
     public Mono<ResponseEntity<Map<String, String>>> updateFoodCost(
-            @PathVariable Integer idFoodCosts,
-            @RequestBody UpdateCostRequestDto dto) {
+            @PathVariable Long idFoodCosts,
+            @RequestBody FoodCostRequestDto dto) {
 
-        return foodCostsService.updateFoodCost(idFoodCosts, dto)
+        return updateCostService.updateFoodCost(idFoodCosts, dto)
                 .thenReturn(
                         ResponseEntity.ok(Collections.singletonMap("message", "Registro actualizado correctamente")));
     }

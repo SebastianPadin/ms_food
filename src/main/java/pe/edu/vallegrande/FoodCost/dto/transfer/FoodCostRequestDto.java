@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InsertCostRequestDto {
+public class FoodCostRequestDto {
     private String weekNumber;
     private String foodType;
     private BigDecimal gramsPerChicken;
