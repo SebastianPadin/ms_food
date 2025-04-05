@@ -16,8 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pe.edu.vallegrande.FoodCost.model.FoodCost;
 import pe.edu.vallegrande.FoodCost.service.FoodCostsService;
-import pe.edu.vallegrande.FoodCost.dto.InsertCostRequestDto;
-import pe.edu.vallegrande.FoodCost.dto.UpdateCostRequestDto;
+import pe.edu.vallegrande.FoodCost.service.InsertCostService;
+import pe.edu.vallegrande.FoodCost.dto.transfer.InsertCostRequestDto;
+import pe.edu.vallegrande.FoodCost.dto.transfer.UpdateCostRequestDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -28,6 +29,8 @@ import reactor.core.publisher.Mono;
 public class FoodCostsRest {
 
     private final FoodCostsService foodCostsService;
+    private final InsertCostService insertCostService;
+
 
     @GetMapping("/actives")
     public Flux<FoodCost> getAllActiveCost() {
@@ -41,7 +44,7 @@ public class FoodCostsRest {
 
     @PostMapping
     public Mono<ResponseEntity<Map<String, String>>> createFoodCost(@RequestBody InsertCostRequestDto dto) {
-        return foodCostsService.addFoodCost(dto)
+        return insertCostService.addFoodCost(dto)
                 .thenReturn(ResponseEntity.ok(Collections.singletonMap("message", "Registro insertado correctamente")));
     }
 

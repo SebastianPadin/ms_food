@@ -15,13 +15,8 @@ public interface FoodCostsRepository extends ReactiveCrudRepository<FoodCost, Lo
 
     Flux<FoodCost> findAllByStatusOrderByIdFoodCostsAsc(String status);
 
-    @Query("CALL insert_food_costs(:weekNumber, :foodId, :gramsPerChicken, :chickensCount, :unitPrice)")
-    Mono<Void> insertFoodCost(
-            String weekNumber,
-            Integer foodId,
-            BigDecimal gramsPerChicken,
-            Integer chickensCount,
-            BigDecimal unitPrice);
+     // Método para obtener el último registro ordenado por startDate
+     Mono<FoodCost> findTopByOrderByStartDateDesc();
 
     @Query("CALL update_food_cost(:idFoodCosts, :weekNumber, :foodId, :gramsPerChicken, :chickensCount, :unitPrice)")
     Mono<Void> updateFoodCost(

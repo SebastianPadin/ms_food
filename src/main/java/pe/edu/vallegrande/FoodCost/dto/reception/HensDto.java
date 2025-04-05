@@ -1,4 +1,4 @@
-package pe.edu.vallegrande.FoodCost.dto;
+package pe.edu.vallegrande.FoodCost.dto.reception;
 
 import java.time.LocalDate;
 

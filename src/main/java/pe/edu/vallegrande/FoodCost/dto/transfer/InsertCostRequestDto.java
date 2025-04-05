@@ -1,4 +1,4 @@
-package pe.edu.vallegrande.FoodCost.dto;
+package pe.edu.vallegrande.FoodCost.dto.transfer;
 
 import lombok.Data;
 import lombok.AllArgsConstructor;
@@ -8,11 +8,9 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateCostRequestDto {
+public class InsertCostRequestDto {
     private String weekNumber;
-    private Integer foodId;
+    private String foodType;
     private BigDecimal gramsPerChicken;
-    private Integer chickensCount;
     private BigDecimal unitPrice;
-
 }
