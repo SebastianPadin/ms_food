@@ -8,6 +8,11 @@ spring:
     url: r2dbc:pool:postgresql://aws-0-us-east-1.pooler.supabase.com:6543/postgres
     username: postgres.axzbiriaypunthimexpq
     password: foods2024@vg
+
+  external:
+  food-service-url: http://localhost:8081/api/foods/actives
+  hens-service-url: http://localhost:8082/api/hens/actives
+    
   #security:
     #oauth2:
       #resourceserver:

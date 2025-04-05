@@ -10,8 +10,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class InsertCostRequestDto {
     private String weekNumber;
-    private Integer foodId;
+    private String foodType;
     private BigDecimal gramsPerChicken;
-    private Integer chickensCount;
     private BigDecimal unitPrice;
 }

@@ -12,7 +12,7 @@ public class FoodCost {
     @Id
     private Long idFoodCosts;
     private String weekNumber;
-    private Integer foodId;
+    private String foodType;
     private BigDecimal gramsPerChicken;
     private BigDecimal totalKg;
     private BigDecimal totalCost;
