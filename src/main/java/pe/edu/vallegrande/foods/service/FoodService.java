@@ -2,8 +2,7 @@ package pe.edu.vallegrande.foods.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pe.edu.vallegrande.foods.dto.FoodInsertRequest;
-import pe.edu.vallegrande.foods.dto.FoodUpdateRequest;
+import pe.edu.vallegrande.foods.dto.FoodRequest;
 import pe.edu.vallegrande.foods.model.Food;
 import pe.edu.vallegrande.foods.repository.FoodRepository;
 import reactor.core.publisher.Flux;
@@ -36,7 +35,7 @@ public class FoodService {
     }
 
     // Método para guardar un nuevo alimento
-    public Mono<Food> createFood(FoodInsertRequest request) {
+    public Mono<Food> createFood(FoodRequest request) {
         Food food = new Food();
         food.setFoodType(request.getFoodType());
         food.setFoodBrand(request.getFoodBrand());
@@ -47,7 +46,7 @@ public class FoodService {
     }
 
     // Método para actualizar un alimento
-    public Mono<Food> updateFood(Long id, FoodUpdateRequest foodRequest) {
+    public Mono<Food> updateFood(Long id, FoodRequest foodRequest) {
         return foodRepository.findById(id)
                 .flatMap(existingFood -> {
                     if ("A".equals(existingFood.getStatus())) {

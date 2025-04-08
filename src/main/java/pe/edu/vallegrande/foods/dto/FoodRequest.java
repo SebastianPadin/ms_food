@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FoodInsertRequest {
+public class FoodRequest {
 
     private String foodType;
     private String foodBrand;

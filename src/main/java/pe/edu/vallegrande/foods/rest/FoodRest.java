@@ -12,8 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pe.edu.vallegrande.foods.model.Food;
-import pe.edu.vallegrande.foods.dto.FoodInsertRequest;
-import pe.edu.vallegrande.foods.dto.FoodUpdateRequest;
+import pe.edu.vallegrande.foods.dto.FoodRequest;
 import pe.edu.vallegrande.foods.service.FoodService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -48,14 +47,14 @@ public class FoodRest {
     }
 
     @PostMapping
-    public Mono<ResponseEntity<Food>> createFood(@RequestBody FoodInsertRequest request) {
+    public Mono<ResponseEntity<Food>> createFood(@RequestBody FoodRequest request) {
         return foodService.createFood(request)
                 .map(food -> ResponseEntity.ok(food))
                 .defaultIfEmpty(ResponseEntity.badRequest().build());
     }
 
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<Food>> updateFood(@PathVariable Long id, @RequestBody FoodUpdateRequest foodRequest) {
+    public Mono<ResponseEntity<Food>> updateFood(@PathVariable Long id, @RequestBody FoodRequest foodRequest) {
         return foodService.updateFood(id, foodRequest)
                 .map(updatedFood -> ResponseEntity.ok(updatedFood))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
