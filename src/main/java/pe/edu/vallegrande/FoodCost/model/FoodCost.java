@@ -1,22 +1,42 @@
 package pe.edu.vallegrande.FoodCost.model;
 
-import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+
+import lombok.Data;
 
 @Data
 @Table("food_costs")
 public class FoodCost {
     @Id
+    @Column("id_food_costs")
     private Long idFoodCosts;
+
+    @Column("week_number")
     private String weekNumber;
+
+    @Column("food_type")
     private String foodType;
+
+    @Column("grams_per_chicken")
     private BigDecimal gramsPerChicken;
+
+    @Column("total_kg")
     private BigDecimal totalKg;
+
+    @Column("total_cost")
     private BigDecimal totalCost;
+
+    @Column("start_date")
     private LocalDate startDate;
+
+    @Column("end_date")
     private LocalDate endDate;
+    
+    @Column("status")
     private String status;
+
 }

@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pe.edu.vallegrande.FoodCost.model.FoodCost;
 import pe.edu.vallegrande.FoodCost.service.FoodCostsService;
-import pe.edu.vallegrande.FoodCost.service.InsertCostService;
 import pe.edu.vallegrande.FoodCost.service.UpdateCostService;
+import pe.edu.vallegrande.FoodCost.service.InsertCostService;
 import pe.edu.vallegrande.FoodCost.dto.transfer.FoodCostRequestDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -29,8 +29,8 @@ import reactor.core.publisher.Mono;
 public class FoodCostsRest {
 
     private final FoodCostsService foodCostsService;
-    private final InsertCostService insertCostService;
     private final UpdateCostService updateCostService;
+    private final InsertCostService insertCostService;
 
 
     @GetMapping("/actives")

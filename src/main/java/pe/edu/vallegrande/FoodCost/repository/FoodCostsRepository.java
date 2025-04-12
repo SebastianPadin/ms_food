@@ -1,7 +1,5 @@
 package pe.edu.vallegrande.FoodCost.repository;
 
-import java.math.BigDecimal;
-import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 import pe.edu.vallegrande.FoodCost.model.FoodCost;
@@ -15,15 +13,6 @@ public interface FoodCostsRepository extends ReactiveCrudRepository<FoodCost, Lo
 
     Flux<FoodCost> findAllByStatusOrderByIdFoodCostsAsc(String status);
 
-     // Método para obtener el último registro ordenado por startDate
-     Mono<FoodCost> findTopByOrderByStartDateDesc();
+    Mono<FoodCost> findTopByOrderByStartDateDesc();
 
-    @Query("CALL update_food_cost(:idFoodCosts, :weekNumber, :foodId, :gramsPerChicken, :chickensCount, :unitPrice)")
-    Mono<Void> updateFoodCost(
-            Integer idFoodCosts,
-            String weekNumber,
-            Integer foodId,
-            BigDecimal gramsPerChicken,
-            Integer chickensCount,
-            BigDecimal unitPrice);
 }
