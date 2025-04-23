@@ -1,4 +1,4 @@
-package pe.edu.vallegrande.foods.rest;
+package pe.edu.vallegrande.foods.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
 @CrossOrigin(origins = "*")
 @RequestMapping("api/foods")
 @AllArgsConstructor
-public class FoodRest {
+public class FoodController {
 
     @Autowired
     private FoodService foodService;
