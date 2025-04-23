@@ -1,7 +1,7 @@
+
 package pe.edu.vallegrande.foods.controller;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,9 +22,8 @@ import reactor.core.publisher.Mono;
 @RequestMapping("api/foods")
 @AllArgsConstructor
 public class FoodController {
-
-    @Autowired
-    private FoodService foodService;
+    
+    private final FoodService foodService;
 
     @GetMapping
     public Flux<Food> getAllFoods() {
