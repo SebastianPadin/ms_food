@@ -1,10 +1,8 @@
-package pe.edu.vallegrande.FoodCost.rest;
+package pe.edu.vallegrande.FoodCost.controller;
 
 import lombok.AllArgsConstructor;
-
 import java.util.Collections;
 import java.util.Map;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +24,7 @@ import reactor.core.publisher.Mono;
 @CrossOrigin(origins = "*")
 @RequestMapping("/api/food-costs")
 @AllArgsConstructor
-public class FoodCostsRest {
+public class FoodCostsController {
 
     private final FoodCostsService foodCostsService;
     private final UpdateCostService updateCostService;
