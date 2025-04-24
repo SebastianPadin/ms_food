@@ -31,7 +31,7 @@ public class FoodService {
 
     // Método para obtener alimentos por tipo (food_type)
     public Flux<Food> getFoodsByType(String foodType) {
-        return foodRepository.findByFoodType(foodType);
+        return foodRepository.findByFoodType("%" + foodType + "%");
     }
 
     // Método para guardar un nuevo alimento
