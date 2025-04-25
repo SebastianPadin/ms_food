@@ -41,6 +41,11 @@ public class FoodCostsController {
         return foodCostsService.getAllInactiveCosts();
     }
 
+    @GetMapping("/search/{weekNumber}")
+    public Flux<FoodCost> getByWeekNumber(@PathVariable String weekNumber) {
+        return foodCostsService.getByWeekNumber(weekNumber);
+    }
+
     @PostMapping
     public Mono<ResponseEntity<Map<String, String>>> createFoodCost(@RequestBody FoodCostRequestDto dto) {
         return insertCostService.addFoodCost(dto)

@@ -13,12 +13,19 @@ public class FoodCostsService {
 
     private final FoodCostsRepository foodCostsRepository;
 
+    // Método para obtener costo de alimentos activos
     public Flux<FoodCost> getAllActiveCosts() {
         return foodCostsRepository.findAllByStatusOrderByIdFoodCostsAsc("A");
     }
 
+    // Método para obtener costo de alimentos inactivos
     public Flux<FoodCost> getAllInactiveCosts() {
         return foodCostsRepository.findAllByStatusOrderByIdFoodCostsAsc("I");
+    }
+
+    // Método para obtener costo de alimentos por semana (week_number)
+    public Flux<FoodCost> getByWeekNumber(String weekNumber){
+        return foodCostsRepository.findByWeekNumber(weekNumber);
     }
 
     // Método para eliminar un costo de alimento lógicamente
