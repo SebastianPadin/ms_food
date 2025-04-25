@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface FoodCostsRepository extends ReactiveCrudRepository<FoodCost, Long> {
 
-    @Query("SELECT * FROM food_costs WHERE LOWER(week_number) LIKE LOWER(CONCAT('%', :weekNumber, '%'))")
+    @Query("SELECT * FROM food_costs WHERE LOWER(week_number) LIKE LOWER(CONCAT('%', :weekNumber, '%')) AND status = 'A'")
     Flux<FoodCost> findByWeekNumber(@Param("weekNumber") String weekNumber);
 
     Flux<FoodCost> findAllByStatusOrderByIdFoodCostsAsc(String status);
