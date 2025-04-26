@@ -6,8 +6,8 @@ spring:
     name: FoodCost
 
   r2dbc:
-    url: r2dbc:pool:postgresql://aws-0-us-east-1.pooler.supabase.com:6543/postgres
-    username: postgres.axzbiriaypunthimexpq
-    password: foods2024@vg
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
 
   
