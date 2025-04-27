@@ -28,8 +28,8 @@ public class UpdateCostService {
     private final WebClient webClient;
     private final FoodCostsRepository foodCostsRepository;
 
-    private final String foodServiceUrl = "https://expert-guacamole-qrwx7rpg59jh66w7-8080.app.github.dev/api/foods/actives";
-    private final String hensServiceUrl = "https://8080-vallegrandeas-lifecycle-mj1l2fs6wgv.ws-us118.gitpod.io/hen/activos";
+    private final String foodServiceUrl = "https://msfood-production.up.railway.app/api/foods/actives";
+    private final String hensServiceUrl = "http://localhost:8085/hen/activos";
 
     public Mono<Void> updateFoodCost(Long idFoodCosts, FoodCostRequestDto request) {
         return foodCostsRepository.findById(idFoodCosts)
