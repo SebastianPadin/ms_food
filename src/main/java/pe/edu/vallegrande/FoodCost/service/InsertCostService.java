@@ -26,8 +26,8 @@ public class InsertCostService {
     private final WebClient webClient;
     private final FoodCostsRepository foodCostsRepository;
 
-    private final String foodServiceUrl = "https://msfood-production.up.railway.app/api/foods/actives";
-    private final String hensServiceUrl = "https://opulent-xylophone-wp475pr44xqh9q9v-8085.app.github.dev/hen/activos";
+    private final String foodServiceUrl = "http://161.132.45.51:8080/api/foods/actives";
+    private final String hensServiceUrl = "http://161.132.45.51:8084/hen/activos";
 
     public Mono<Void> addFoodCost(FoodCostRequestDto request) {
         System.out.println("Request recibido: " + request);
