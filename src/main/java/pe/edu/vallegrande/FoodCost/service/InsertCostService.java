@@ -17,6 +17,8 @@ import pe.edu.vallegrande.FoodCost.dto.transfer.FoodCostRequestDto;
 import pe.edu.vallegrande.FoodCost.model.FoodCost;
 import pe.edu.vallegrande.FoodCost.repository.FoodCostsRepository;
 import reactor.core.publisher.Mono;
+import org.springframework.beans.factory.annotation.Value;
+
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +28,11 @@ public class InsertCostService {
     private final WebClient webClient;
     private final FoodCostsRepository foodCostsRepository;
 
-    private final String foodServiceUrl = "http://161.132.45.51:8080/api/foods/actives";
-    private final String hensServiceUrl = "http://161.132.45.51:8084/hen/activos";
+    @Value("${api.food-service-url}")
+    private String foodServiceUrl;
+    
+    @Value("${api.hens-service-url}")
+    private String hensServiceUrl;
 
     public Mono<Void> addFoodCost(FoodCostRequestDto request) {
         System.out.println("Request recibido: " + request);

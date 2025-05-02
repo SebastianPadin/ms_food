@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -28,8 +29,11 @@ public class UpdateCostService {
     private final WebClient webClient;
     private final FoodCostsRepository foodCostsRepository;
 
-    private final String foodServiceUrl = "http://161.132.45.51:8080/api/foods/actives";
-    private final String hensServiceUrl = "http://161.132.45.51:8084/hen/activos";
+    @Value("${api.food-service-url}")
+    private String foodServiceUrl;
+    
+    @Value("${api.hens-service-url}")
+    private String hensServiceUrl;
 
     public Mono<Void> updateFoodCost(Long idFoodCosts, FoodCostRequestDto request) {
         return foodCostsRepository.findById(idFoodCosts)

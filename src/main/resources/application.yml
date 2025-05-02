@@ -10,4 +10,7 @@ spring:
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
 
+api:
+  food-service-url: ${FOOD_SERVICE_URL}
+  hens-service-url: ${HENS_SERVICE_URL}
   

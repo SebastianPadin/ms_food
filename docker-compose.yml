@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  foodcost-service:
+    image: sebast19/ms_foodcost:backend
+    container_name: foodcost-service
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    restart: always
