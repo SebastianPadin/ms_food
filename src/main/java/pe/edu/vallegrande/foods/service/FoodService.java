@@ -1,6 +1,6 @@
 package pe.edu.vallegrande.foods.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pe.edu.vallegrande.foods.dto.FoodRequest;
 import pe.edu.vallegrande.foods.model.Food;
@@ -9,10 +9,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
+@RequiredArgsConstructor    
 public class FoodService {
 
-    @Autowired
-    private FoodRepository foodRepository;
+    private final FoodRepository foodRepository;
 
     // Método para obtener todos los alimentos
     public Flux<Food> getAllFoods() {
