@@ -1,3 +1,6 @@
+/**
+ * Paquete que gestiona la lógica de negocio de los alimentos.
+ */
 package pe.edu.vallegrande.foods.service;
 
 import lombok.RequiredArgsConstructor;
@@ -8,18 +11,18 @@ import pe.edu.vallegrande.foods.repository.FoodRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-/**
- * Servicio para gestionar alimentos.
- * Puede ser extendida por otras clases para agregar funcionalidad adicional.
- */
 @Service
 @RequiredArgsConstructor
 public class FoodService {
 
+    /**
+     * Repositorio para acceder a los datos de alimentos.
+     */
     private final FoodRepository foodRepository;
 
     /**
-     * Lista todos los alimentos
+     * Lista todos los alimentos.
+     * 
      * @return Todos los alimentos en la bd.
      *
      */
@@ -28,7 +31,8 @@ public class FoodService {
     }
 
     /**
-     * Lista todos los alimentos activos
+     * Lista todos los alimentos activos.
+     * 
      * @return Alimento con estado A.
      *
      */
@@ -37,7 +41,8 @@ public class FoodService {
     }
 
     /**
-     * Lista todos los alimentos inactivos
+     * Lista todos los alimentos inactivos.
+     * 
      * @return Alimento con estado I.
      *
      */
@@ -46,12 +51,13 @@ public class FoodService {
     }
 
     /**
-     * Filtra alimentos por tipo
+     * Filtra alimentos por tipo.
+     * 
      * @param foodType Tipo de alimento que desea filtrar.
      * @return Alimento filtrado.
      *
      */
-    public Flux<Food> getFoodsByType(String foodType) {
+    public Flux<Food> getFoodsByType(final String foodType) {
         return foodRepository.findByFoodTypeContaining(foodType);
     }
 
@@ -61,7 +67,7 @@ public class FoodService {
      * @param foodRequest Datos enviados del alimento.
      * @return Alimento insertado.
      */
-    public Mono<Food> createFood(FoodRequest request) {
+    public Mono<Food> createFood(final FoodRequest request) {
         Food food = new Food();
         food.setFoodType(request.getFoodType());
         food.setFoodBrand(request.getFoodBrand());
@@ -74,11 +80,11 @@ public class FoodService {
     /**
      * Actualiza los datos de un alimento.
      *
-     * @param id Identificador del alimento.
+     * @param id          Identificador del alimento.
      * @param foodRequest Datos actualizados del alimento.
      * @return Alimento actualizado.
      */
-    public Mono<Food> updateFood(Long id, FoodRequest foodRequest) {
+    public Mono<Food> updateFood(final Long id, final FoodRequest foodRequest) {
         return foodRepository.findById(id)
                 .flatMap(existingFood -> {
                     if ("A".equals(existingFood.getStatus())) {
@@ -94,40 +100,40 @@ public class FoodService {
     }
 
     /**
-     * Elimina un registro de manera lógica
+     * Elimina un registro de manera lógica.
      *
      * @param id Identificador del alimento.
      * @return Alimento eliminado.
      */
-    public Mono<Food> deleteFoodLogically(Long id) {
+    public Mono<Food> deleteFoodLogically(final Long id) {
         return foodRepository.findById(id)
-                .flatMap(existingFood -> {
-                    if ("A".equals(existingFood.getStatus())) {
-                        existingFood.setStatus("I");
-                        return foodRepository.save(existingFood);
-                    } else {
-                        return Mono.error(new RuntimeException("Food is already inactive"));
-                    }
-                })
-                .switchIfEmpty(Mono.error(new RuntimeException("Food not found")));
+            .flatMap(existingFood -> {
+                if ("A".equals(existingFood.getStatus())) {
+                    existingFood.setStatus("I");
+                    return foodRepository.save(existingFood);
+                } else {
+                    return Mono.error(new RuntimeException("Food is already inactive"));
+                }
+            })
+            .switchIfEmpty(Mono.error(new RuntimeException("Food not found")));
     }
 
     /**
-     * Restaura un registro de alimento
+     * Restaura un registro de alimento.
      *
      * @param id Identificador del alimento.
      * @return Alimento eliminado restaurado.
      */
-    public Mono<Food> restoreFood(Long id) {
+    public Mono<Food> restoreFood(final Long id) {
         return foodRepository.findById(id)
-                .flatMap(existingFood -> {
-                    if ("I".equals(existingFood.getStatus())) {
-                        existingFood.setStatus("A");
-                        return foodRepository.save(existingFood);
-                    } else {
-                        return Mono.error(new RuntimeException("Food is already active"));
-                    }
-                })
-                .switchIfEmpty(Mono.error(new RuntimeException("Food not found")));
+            .flatMap(existingFood -> {
+                if ("I".equals(existingFood.getStatus())) {
+                    existingFood.setStatus("A");
+                    return foodRepository.save(existingFood);
+                } else {
+                    return Mono.error(new RuntimeException("Food is already active"));
+                }
+            })
+            .switchIfEmpty(Mono.error(new RuntimeException("Food not found")));
     }
 }

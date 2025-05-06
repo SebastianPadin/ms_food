@@ -1,3 +1,6 @@
+/**
+ * Paquete que contiene la configuración global de la aplicación.
+ */
 package pe.edu.vallegrande.foods.config;
 
 import org.springframework.context.annotation.Bean;
@@ -6,16 +9,20 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
-/**
- * Paquete que contiene la configuración de CORS.
- */
 @Configuration
-public class CorsConfig {
+public final class CorsConfig {
 
+    /**
+     * Configura los filtros CORS para permitir solicitudes entre dominios.
+     *
+     * @return Filtro CORS configurado.
+     */
     @Bean
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.addAllowedOrigin("https://friendly-zebra-7qgxvqp4w5jhp5x6-4200.app.github.dev");
+        corsConfig.addAllowedOrigin(
+            "https://friendly-zebra-7qgxvqp4w5jhp5x6-4200.app.github.dev"
+        );
         corsConfig.addAllowedMethod("*");
         corsConfig.addAllowedHeader("*");
         corsConfig.setAllowCredentials(true);
