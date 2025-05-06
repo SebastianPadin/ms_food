@@ -24,7 +24,7 @@ jobs:
           mvn checkstyle:check || exit 1
 
       - name: 📂 Upload Checkstyle Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: checkstyle-report
           path: target/checkstyle-result.xml
@@ -34,7 +34,7 @@ jobs:
           mvn org.owasp:dependency-check-maven:check || exit 1
 
       - name: 📂 Upload OWASP Dependency Check Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: owasp-report
           path: target/dependency-check-report.html
