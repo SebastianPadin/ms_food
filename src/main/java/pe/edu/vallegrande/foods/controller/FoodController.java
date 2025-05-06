@@ -17,6 +17,9 @@ import pe.edu.vallegrande.foods.service.FoodService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/**
+ * Paquete que contiene el controlador con las APIs.
+ */
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("api/foods")

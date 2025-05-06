@@ -7,6 +7,9 @@ import pe.edu.vallegrande.foods.model.Food;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
+/**
+ * Paquete que contiene el repositorio.
+ */
 @Repository
 public interface FoodRepository extends ReactiveCrudRepository<Food, Long> {
 

@@ -6,6 +6,9 @@ import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.data.relational.core.mapping.Column;
 import java.time.LocalDate;
 
+/**
+ * Paquete que contiene el modelo Food.
+ */
 @Data
 @Table("Foods")
 public class Food {

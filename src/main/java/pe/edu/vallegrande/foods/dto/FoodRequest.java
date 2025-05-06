@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Paquete que contiene los DTOs de Food para insertar y actualizar.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

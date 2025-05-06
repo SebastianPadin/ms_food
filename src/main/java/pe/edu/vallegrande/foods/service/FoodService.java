@@ -8,33 +8,59 @@ import pe.edu.vallegrande.foods.repository.FoodRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/**
+ * Servicio para gestionar alimentos.
+ * Puede ser extendida por otras clases para agregar funcionalidad adicional.
+ */
 @Service
-@RequiredArgsConstructor    
+@RequiredArgsConstructor
 public class FoodService {
 
     private final FoodRepository foodRepository;
 
-    // Método para obtener todos los alimentos
+    /**
+     * Lista todos los alimentos
+     * @return Todos los alimentos en la bd.
+     *
+     */
     public Flux<Food> getAllFoods() {
         return foodRepository.findAll();
     }
 
-    // Método para obtener todos los alimentos con estado 'A'
+    /**
+     * Lista todos los alimentos activos
+     * @return Alimento con estado A.
+     *
+     */
     public Flux<Food> getAllActiveFoods() {
         return foodRepository.findAllByStatus("A");
     }
 
-    // Método para obtener todos los alimentos inactivos (estado 'I')
+    /**
+     * Lista todos los alimentos inactivos
+     * @return Alimento con estado I.
+     *
+     */
     public Flux<Food> getAllInactiveFoods() {
         return foodRepository.findAllByStatus("I");
     }
 
-    // Método para obtener alimentos por tipo (food_type)
+    /**
+     * Filtra alimentos por tipo
+     * @param foodType Tipo de alimento que desea filtrar.
+     * @return Alimento filtrado.
+     *
+     */
     public Flux<Food> getFoodsByType(String foodType) {
         return foodRepository.findByFoodTypeContaining(foodType);
     }
 
-    // Método para guardar un nuevo alimento
+    /**
+     * Inserta un nuevo alimento
+     *
+     * @param foodRequest Datos enviados del alimento.
+     * @return Alimento insertado.
+     */
     public Mono<Food> createFood(FoodRequest request) {
         Food food = new Food();
         food.setFoodType(request.getFoodType());
@@ -45,7 +71,13 @@ public class FoodService {
         return foodRepository.save(food);
     }
 
-    // Método para actualizar un alimento
+    /**
+     * Actualiza los datos de un alimento.
+     *
+     * @param id Identificador del alimento.
+     * @param foodRequest Datos actualizados del alimento.
+     * @return Alimento actualizado.
+     */
     public Mono<Food> updateFood(Long id, FoodRequest foodRequest) {
         return foodRepository.findById(id)
                 .flatMap(existingFood -> {
@@ -61,7 +93,12 @@ public class FoodService {
                 });
     }
 
-    // Método para eliminar un alimento lógicamente
+    /**
+     * Elimina un registro de manera lógica
+     *
+     * @param id Identificador del alimento.
+     * @return Alimento eliminado.
+     */
     public Mono<Food> deleteFoodLogically(Long id) {
         return foodRepository.findById(id)
                 .flatMap(existingFood -> {
@@ -75,7 +112,12 @@ public class FoodService {
                 .switchIfEmpty(Mono.error(new RuntimeException("Food not found")));
     }
 
-    // Método para restaurar un alimento (cambiar estado de 'I' a 'A')
+    /**
+     * Restaura un registro de alimento
+     *
+     * @param id Identificador del alimento.
+     * @return Alimento eliminado restaurado.
+     */
     public Mono<Food> restoreFood(Long id) {
         return foodRepository.findById(id)
                 .flatMap(existingFood -> {
