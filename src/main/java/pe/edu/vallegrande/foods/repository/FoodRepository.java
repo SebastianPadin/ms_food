@@ -27,9 +27,9 @@ public interface FoodRepository extends ReactiveCrudRepository<Food, Long> {
      * @param foodType Tipo de comida a buscar.
      * @return Lista de alimento filtrado.
      */
-    @Query("SELECT * FROM Foods " +
-            "WHERE LOWER(food_type) LIKE LOWER(CONCAT('%', :foodType, '%')) " +
-            "AND status = 'A'")
+    @Query("SELECT * FROM Foods WHERE LOWER(food_type) LIKE LOWER(CONCAT('%', " 
+           + foodType 
+           + "%')) AND status = 'A'")
     Flux<Food> findByFoodTypeContaining(@Param("foodType") String foodType);
 
 }
