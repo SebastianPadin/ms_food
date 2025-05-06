@@ -1,4 +1,4 @@
-name: Validate Code Quality
+name: Validate Backend Security
 
 on:
   push:
@@ -19,15 +19,15 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: 📝 Run Linter (Checkstyle)
+      - name: 🛑 Run SpotBugs (Detecta errores críticos)
         run: |
-          mvn checkstyle:check || exit 1
+          mvn com.github.spotbugs:spotbugs-maven-plugin:check || exit 1
 
-      - name: 📂 Upload Checkstyle Report
+      - name: 📂 Upload SpotBugs Report
         uses: actions/upload-artifact@v4
         with:
-          name: checkstyle-report
-          path: target/checkstyle-result.xml
+          name: spotbugs-report
+          path: target/spotbugs.xml
 
       - name: 🔍 Security Scan (OWASP Dependency Check)
         run: |
@@ -38,3 +38,13 @@ jobs:
         with:
           name: owasp-report
           path: target/dependency-check-report.html
+
+      - name: 🚀 Run PMD Analysis (Detecta malas prácticas)
+        run: |
+          mvn pmd:pmd || exit 1
+
+      - name: 📂 Upload PMD Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: pmd-report
+          path: target/pmd.xml
