@@ -21,8 +21,20 @@ jobs:
 
       - name: 📝 Run Linter (Checkstyle)
         run: |
-          mvn checkstyle:check
+          mvn checkstyle:check || exit 1
+
+      - name: 📂 Upload Checkstyle Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: checkstyle-report
+          path: target/checkstyle-result.xml
 
       - name: 🔍 Security Scan (OWASP Dependency Check)
         run: |
-          mvn org.owasp:dependency-check-maven:check
+          mvn org.owasp:dependency-check-maven:check || exit 1
+
+      - name: 📂 Upload OWASP Dependency Check Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: owasp-report
+          path: target/dependency-check-report.html
