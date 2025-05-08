@@ -10,7 +10,7 @@ import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 @Configuration
-public final class CorsConfig {
+public class CorsConfig {
 
     /**
      * Configura los filtros CORS para permitir solicitudes entre dominios.
