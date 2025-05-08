@@ -21,7 +21,7 @@ public class CorsConfig {
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration corsConfig = new CorsConfiguration();
         corsConfig.addAllowedOrigin(
-            "https://friendly-zebra-7qgxvqp4w5jhp5x6-4200.app.github.dev"
+            "http://localhost:4200"
         );
         corsConfig.addAllowedMethod("*");
         corsConfig.addAllowedHeader("*");
