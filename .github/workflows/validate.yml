@@ -3,7 +3,7 @@ name: Validate Backend Security
 on:
   push:
     branches:
-      - develop2
+      - deve
 
 jobs:
   validate:
