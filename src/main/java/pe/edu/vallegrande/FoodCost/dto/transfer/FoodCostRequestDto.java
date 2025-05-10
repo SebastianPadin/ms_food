@@ -13,4 +13,6 @@ public class FoodCostRequestDto {
     private String foodType;
     private BigDecimal gramsPerChicken;
     private BigDecimal unitPrice;
+    private Long shedId;
+    private String shedName;
 }

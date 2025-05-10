@@ -31,70 +31,75 @@ public class UpdateCostService {
 
     @Value("${api.food-service-url}")
     private String foodServiceUrl;
-    
+
     @Value("${api.hens-service-url}")
     private String hensServiceUrl;
 
     public Mono<Void> updateFoodCost(Long idFoodCosts, FoodCostRequestDto request) {
         return foodCostsRepository.findById(idFoodCosts)
-            .switchIfEmpty(Mono.error(new RuntimeException(
-                "No se encontró el registro con ID: " + idFoodCosts)))
-            .flatMap(existing -> getFoodAndHensData(request)
-                .flatMap(tuple -> {
-                    FoodDto food = tuple.getT1();
-                    HensDto hens = tuple.getT2();
+                .switchIfEmpty(Mono.error(new RuntimeException("No se encontró el registro con ID: " + idFoodCosts)))
+                .flatMap(existing -> getFoodAndHensData(request)
+                        .flatMap(tuple -> {
+                            FoodDto food = tuple.getT1();
+                            HensDto hens = tuple.getT2();
 
-                    validateFoodAmount(food.getAmount());
+                            System.out.println("🐔 Gallinas activas encontradas: " + hens.getQuantity());
+                            System.out.println("🌽 Alimento encontrado: " + food.getFoodType() + ", Cantidad: " + food.getAmount());
 
-                    BigDecimal totalKg = calculateTotalKg(request.getGramsPerChicken(), hens.getQuantity());
-                    System.out.println("Total de Kg calculado: " + totalKg);
+                            validateFoodAmount(food.getAmount());
 
-                    BigDecimal costPerKg = calculateCostPerKg(request.getUnitPrice(), BigDecimal.valueOf(food.getAmount()));
-                    System.out.println("Costo por Kg calculado: " + costPerKg);
+                            BigDecimal totalKg = calculateTotalKg(request.getGramsPerChicken(), hens.getQuantity());
+                            System.out.println("📦 Total de Kg calculado: " + totalKg);
 
-                    BigDecimal totalCost = calculateTotalCost(totalKg, costPerKg);
-                    System.out.println("Costo total calculado: " + totalCost);
+                            BigDecimal costPerKg = calculateCostPerKg(request.getUnitPrice(), BigDecimal.valueOf(food.getAmount()));
+                            System.out.println("💰 Costo por Kg calculado: " + costPerKg);
 
-                    updateEditableFields(existing, request, totalKg, totalCost);
+                            BigDecimal totalCost = calculateTotalCost(totalKg, costPerKg);
+                            System.out.println("💸 Costo total calculado: " + totalCost);
 
-                    return foodCostsRepository.save(existing).then();
-                }));
+                            updateEditableFields(existing, request, totalKg, totalCost, hens);
+
+                            return foodCostsRepository.save(existing)
+                                    .doOnSuccess(updated -> System.out.println("✅ Registro actualizado con éxito: ID " + updated.getIdFoodCosts()))
+                                    .then();
+                        }));
     }
 
     private Mono<Tuple2<FoodDto, HensDto>> getFoodAndHensData(FoodCostRequestDto request) {
         Mono<FoodDto> foodMono = webClient.get()
-            .uri(foodServiceUrl)
-            .retrieve()
-            .bodyToFlux(FoodDto.class)
-            .filter(f -> f.getFoodType().equalsIgnoreCase(request.getFoodType()))
-            .next()
-            .switchIfEmpty(Mono.error(new RuntimeException(
-                "No se encontró alimento del tipo: " + request.getFoodType())));
+                .uri(foodServiceUrl)
+                .retrieve()
+                .bodyToFlux(FoodDto.class)
+                .filter(f -> f.getFoodType().equalsIgnoreCase(request.getFoodType()))
+                .next()
+                .switchIfEmpty(Mono.error(new RuntimeException(
+                        "❌ No se encontró alimento del tipo: " + request.getFoodType())));
 
         Mono<HensDto> hensMono = webClient.get()
-            .uri(hensServiceUrl)
-            .retrieve()
-            .bodyToFlux(HensDto.class)
-            .filter(h -> !h.getArrivalDate().isAfter(LocalDate.now()))
-            .collect(Collectors.maxBy(Comparator.comparingLong(HensDto::getId)))
-            .flatMap(optional -> optional
-                .map(Mono::just)
-                .orElseGet(() -> Mono.error(new RuntimeException(
-                    "No se encontraron gallinas válidas."))));
+                .uri(hensServiceUrl)
+                .retrieve()
+                .bodyToFlux(HensDto.class)
+                .filter(h -> h.getShedId().equals(request.getShedId()))
+                .filter(h -> !h.getArrivalDate().isAfter(LocalDate.now()))
+                .collect(Collectors.maxBy(Comparator.comparingLong(HensDto::getId)))
+                .flatMap(optional -> optional
+                        .map(Mono::just)
+                        .orElseGet(() -> Mono.error(new RuntimeException(
+                                "❌ No se encontraron gallinas válidas en el galpón con ID: " + request.getShedId()))));
 
         return Mono.zip(foodMono, hensMono);
     }
 
     private void validateFoodAmount(Integer amount) {
         if (amount == null || BigDecimal.valueOf(amount).compareTo(BigDecimal.ZERO) == 0) {
-            throw new RuntimeException("Cantidad inválida de alimento");
+            throw new RuntimeException("❌ Cantidad inválida de alimento");
         }
     }
 
     private BigDecimal calculateTotalKg(BigDecimal gramsPerChicken, int quantity) {
         return gramsPerChicken.multiply(BigDecimal.valueOf(quantity))
-            .multiply(BigDecimal.valueOf(7))
-            .divide(BigDecimal.valueOf(1000), 2, RoundingMode.HALF_UP);
+                .multiply(BigDecimal.valueOf(7)) // 7 días
+                .divide(BigDecimal.valueOf(1000), 2, RoundingMode.HALF_UP); // Convertir a Kg
     }
 
     private BigDecimal calculateCostPerKg(BigDecimal unitPrice, BigDecimal amount) {
@@ -106,11 +111,13 @@ public class UpdateCostService {
     }
 
     private void updateEditableFields(FoodCost existing, FoodCostRequestDto request, BigDecimal totalKg,
-                                      BigDecimal totalCost) {
+                                      BigDecimal totalCost, HensDto hens) {
         existing.setWeekNumber(request.getWeekNumber());
         existing.setFoodType(request.getFoodType());
         existing.setGramsPerChicken(request.getGramsPerChicken());
         existing.setTotalKg(totalKg);
         existing.setTotalCost(totalCost);
+        existing.setShedId(hens.getShedId());
+        existing.setShedName(request.getShedName());
     }
 }

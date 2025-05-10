@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -17,8 +18,6 @@ import pe.edu.vallegrande.FoodCost.dto.transfer.FoodCostRequestDto;
 import pe.edu.vallegrande.FoodCost.model.FoodCost;
 import pe.edu.vallegrande.FoodCost.repository.FoodCostsRepository;
 import reactor.core.publisher.Mono;
-import org.springframework.beans.factory.annotation.Value;
-
 
 @Service
 @RequiredArgsConstructor
@@ -30,14 +29,14 @@ public class InsertCostService {
 
     @Value("${api.food-service-url}")
     private String foodServiceUrl;
-    
+
     @Value("${api.hens-service-url}")
     private String hensServiceUrl;
 
     public Mono<Void> addFoodCost(FoodCostRequestDto request) {
         System.out.println("Request recibido: " + request);
 
-        return Mono.zip(getFood(request), getHens())
+        return Mono.zip(getFood(request), getHens(request.getShedId()))
                 .flatMap(tuple -> processFoodCost(tuple.getT1(), tuple.getT2(), request));
     }
 
@@ -55,14 +54,15 @@ public class InsertCostService {
                         "No se encontró alimento para el tipo: " + request.getFoodType())));
     }
 
-    private Mono<HensDto> getHens() {
+    private Mono<HensDto> getHens(Long shedId) {
         return webClient.get()
                 .uri(hensServiceUrl)
                 .retrieve()
                 .bodyToFlux(HensDto.class)
                 .filter(h -> {
                     System.out.println("Evaluando gallinas: " + h);
-                    return !h.getArrivalDate().isAfter(LocalDate.now());
+                    return !h.getArrivalDate().isAfter(LocalDate.now())
+                            && h.getShedId().equals(shedId); // ← filtro por shedId
                 })
                 .collect(Collectors.maxBy(Comparator.comparingLong(HensDto::getId)))
                 .flatMap(optional -> optional
@@ -71,7 +71,7 @@ public class InsertCostService {
                             return Mono.just(h);
                         })
                         .orElseGet(() -> Mono.error(new RuntimeException(
-                                "No se encontraron gallinas válidas."))));
+                                "No se encontraron gallinas válidas para el galpón ID: " + shedId))));
     }
 
     private Mono<Void> processFoodCost(FoodDto food, HensDto hens, FoodCostRequestDto request) {
@@ -109,13 +109,12 @@ public class InsertCostService {
         return totalKg.multiply(costPerKg).setScale(2, RoundingMode.HALF_UP);
     }
 
-    private Mono<Void> saveFoodCost(FoodCostRequestDto request, BigDecimal totalKg, BigDecimal totalCost,
-            HensDto hens) {
+    private Mono<Void> saveFoodCost(FoodCostRequestDto request, BigDecimal totalKg, BigDecimal totalCost, HensDto hens) {
         return foodCostsRepository.findTopByOrderByStartDateDesc()
                 .switchIfEmpty(Mono.defer(() -> {
                     LocalDate startDate = hens.getArrivalDate();
                     LocalDate endDate = calculateEndDate(startDate);
-                    FoodCost foodCost = buildFoodCost(request, totalKg, totalCost, startDate, endDate);
+                    FoodCost foodCost = buildFoodCost(request, totalKg, totalCost, startDate, endDate, hens);
 
                     System.out.println("Registro FoodCost (inicial): " + foodCost);
 
@@ -124,7 +123,7 @@ public class InsertCostService {
                 .flatMap(lastFoodCost -> {
                     LocalDate startDate = lastFoodCost.getEndDate().plusDays(1);
                     LocalDate endDate = calculateEndDate(startDate);
-                    FoodCost foodCost = buildFoodCost(request, totalKg, totalCost, startDate, endDate);
+                    FoodCost foodCost = buildFoodCost(request, totalKg, totalCost, startDate, endDate, hens);
 
                     System.out.println("Registro FoodCost (nuevo): " + foodCost);
 
@@ -138,7 +137,7 @@ public class InsertCostService {
     }
 
     private FoodCost buildFoodCost(FoodCostRequestDto request, BigDecimal totalKg, BigDecimal totalCost,
-            LocalDate startDate, LocalDate endDate) {
+                                   LocalDate startDate, LocalDate endDate, HensDto hens) {
         FoodCost foodCost = new FoodCost();
         foodCost.setWeekNumber(request.getWeekNumber());
         foodCost.setFoodType(request.getFoodType());
@@ -147,6 +146,8 @@ public class InsertCostService {
         foodCost.setTotalCost(totalCost);
         foodCost.setStartDate(startDate);
         foodCost.setEndDate(endDate);
+        foodCost.setShedId(hens.getShedId());
+        foodCost.setShedName(request.getShedName());
         foodCost.setStatus("A");
         return foodCost;
     }

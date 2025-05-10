@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-
 import lombok.Data;
 
 @Data
@@ -35,6 +34,12 @@ public class FoodCost {
 
     @Column("end_date")
     private LocalDate endDate;
+
+    @Column("shed_id")
+    private Long shedId;
+
+    @Column("shed_name")
+    private String shedName;
     
     @Column("status")
     private String status;
