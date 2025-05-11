@@ -16,6 +16,7 @@ public interface FoodCostsRepository extends ReactiveCrudRepository<FoodCost, Lo
 
     Flux<FoodCost> findAllByStatusOrderByIdFoodCostsAsc(String status);
 
-    Mono<FoodCost> findTopByOrderByStartDateDesc();
+    Mono<FoodCost> findTopByShedIdOrderByStartDateDesc(Long shedId);
+
 
 }

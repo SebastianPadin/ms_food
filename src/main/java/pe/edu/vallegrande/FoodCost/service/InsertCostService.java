@@ -110,13 +110,13 @@ public class InsertCostService {
     }
 
     private Mono<Void> saveFoodCost(FoodCostRequestDto request, BigDecimal totalKg, BigDecimal totalCost, HensDto hens) {
-        return foodCostsRepository.findTopByOrderByStartDateDesc()
+        return foodCostsRepository.findTopByShedIdOrderByStartDateDesc(request.getShedId())
                 .switchIfEmpty(Mono.defer(() -> {
                     LocalDate startDate = hens.getArrivalDate();
                     LocalDate endDate = calculateEndDate(startDate);
                     FoodCost foodCost = buildFoodCost(request, totalKg, totalCost, startDate, endDate, hens);
 
-                    System.out.println("Registro FoodCost (inicial): " + foodCost);
+                    System.out.println("Registro FoodCost inicial para galpón " + request.getShedId() + ": " + foodCost);
 
                     return saveAndLogFoodCost(foodCost, true);
                 }))
@@ -125,7 +125,7 @@ public class InsertCostService {
                     LocalDate endDate = calculateEndDate(startDate);
                     FoodCost foodCost = buildFoodCost(request, totalKg, totalCost, startDate, endDate, hens);
 
-                    System.out.println("Registro FoodCost (nuevo): " + foodCost);
+                    System.out.println("Registro FoodCost nuevo para galpón " + request.getShedId() + ": " + foodCost);
 
                     return saveAndLogFoodCost(foodCost, false);
                 })
