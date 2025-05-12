@@ -5,6 +5,6 @@ import lombok.Data;
 /*Dto que consumirá el enpoint del microservicio FOOD*/
 @Data
 public class FoodDto {
-    private String foodType;
+    private Long id_food;
     private Integer amount;
 }
