@@ -3,10 +3,7 @@ package pe.edu.vallegrande.FoodCost.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -43,12 +40,13 @@ public class UpdateCostService {
                             FoodDto food = tuple.getT1();
                             HensDto hens = tuple.getT2();
 
-                            System.out.println("🐔 Gallinas activas encontradas: " + hens.getQuantity());
-                            System.out.println("🌽 Alimento encontrado: " + food.getFoodType() + ", Cantidad: " + food.getAmount());
+                            System.out.println("🐔 Gallina encontrada: ID " + hens.getId());
+                            System.out.println("🌽 Alimento encontrado: " + ", Cantidad: " + food.getAmount());
 
                             validateFoodAmount(food.getAmount());
 
-                            BigDecimal totalKg = calculateTotalKg(request.getGramsPerChicken(), hens.getQuantity());
+                            // Se utiliza la cantidad de gallinas obtenida para recalcular el total de Kg
+                            BigDecimal totalKg = calculateTotalKg(request.getGramsPerChicken(), request.getQuantity());
                             System.out.println("📦 Total de Kg calculado: " + totalKg);
 
                             BigDecimal costPerKg = calculateCostPerKg(request.getUnitPrice(), BigDecimal.valueOf(food.getAmount()));
@@ -66,26 +64,26 @@ public class UpdateCostService {
     }
 
     private Mono<Tuple2<FoodDto, HensDto>> getFoodAndHensData(FoodCostRequestDto request) {
+        // Actualizamos el filtro para el alimento utilizando el ID, igual a lo realizado en InsertCostService.
         Mono<FoodDto> foodMono = webClient.get()
                 .uri(foodServiceUrl)
                 .retrieve()
                 .bodyToFlux(FoodDto.class)
-                .filter(f -> f.getFoodType().equalsIgnoreCase(request.getFoodType()))
+                .filter(f -> f.getId_food().equals(request.getFoodId()))
                 .next()
                 .switchIfEmpty(Mono.error(new RuntimeException(
-                        "❌ No se encontró alimento del tipo: " + request.getFoodType())));
+                        "❌ No se encontró alimento con ID: " + request.getFoodId())));
 
+        // Actualizamos el filtro para las gallinas utilizando el ID (y no el shedId) y validamos la fecha, igual que en InsertCostService.
         Mono<HensDto> hensMono = webClient.get()
                 .uri(hensServiceUrl)
                 .retrieve()
                 .bodyToFlux(HensDto.class)
-                .filter(h -> h.getShedId().equals(request.getShedId()))
+                .filter(h -> h.getId().equals(request.getHensId()))
                 .filter(h -> !h.getArrivalDate().isAfter(LocalDate.now()))
-                .collect(Collectors.maxBy(Comparator.comparingLong(HensDto::getId)))
-                .flatMap(optional -> optional
-                        .map(Mono::just)
-                        .orElseGet(() -> Mono.error(new RuntimeException(
-                                "❌ No se encontraron gallinas válidas en el galpón con ID: " + request.getShedId()))));
+                .next()
+                .switchIfEmpty(Mono.error(new RuntimeException(
+                        "❌ No se encontró gallina con ID: " + request.getHensId())));
 
         return Mono.zip(foodMono, hensMono);
     }
@@ -98,8 +96,8 @@ public class UpdateCostService {
 
     private BigDecimal calculateTotalKg(BigDecimal gramsPerChicken, int quantity) {
         return gramsPerChicken.multiply(BigDecimal.valueOf(quantity))
-                .multiply(BigDecimal.valueOf(7)) // 7 días
-                .divide(BigDecimal.valueOf(1000), 2, RoundingMode.HALF_UP); // Convertir a Kg
+                .multiply(BigDecimal.valueOf(7)) // 7 días de consumo
+                .divide(BigDecimal.valueOf(1000), 2, RoundingMode.HALF_UP); // Conversión a Kg
     }
 
     private BigDecimal calculateCostPerKg(BigDecimal unitPrice, BigDecimal amount) {
@@ -117,7 +115,7 @@ public class UpdateCostService {
         existing.setGramsPerChicken(request.getGramsPerChicken());
         existing.setTotalKg(totalKg);
         existing.setTotalCost(totalCost);
-        existing.setShedId(hens.getShedId());
+        existing.setShedId(hens.getShedId()); 
         existing.setShedName(request.getShedName());
     }
 }
