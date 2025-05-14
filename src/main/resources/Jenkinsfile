@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Clonar Repositorio') {
             steps {
-                git 'https://github.com/SebastianPadin/ms_food.git'
+                git branch: 'develop', url: 'https://github.com/SebastianPadin/ms_food.git'
             }
         }
         stage('Compilar') {
