@@ -4,14 +4,24 @@ pipeline {
         maven 'Maven3'
     }
     stages {
+        stage('Clonar Repositorio') {
+            steps {
+                git 'https://github.com/tu-repositorio.git'
+            }
+        }
         stage('Compilar') {
             steps {
                 bat 'mvn clean install -DskipTests'
             }
         }
-        stage('Pruebas de Integración') {
+        stage('Ejecutar Pruebas Unitarias') {
             steps {
                 bat 'mvn test'
+            }
+        }
+        stage('Generar Artefacto') {
+            steps {
+                archiveArtifacts artifacts: '**/*.jar', fingerprint: true
             }
         }
     }
