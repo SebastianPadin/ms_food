@@ -3,10 +3,14 @@ pipeline {
     tools {
         maven 'Maven3'
     }
+    environment {
+        SONAR_HOST_URL = 'http://localhost:9000'
+        SONAR_TOKEN = credentials('sonar-token')
+    }
     stages {
         stage('Clonar Repositorio') {
             steps {
-                git branch: 'develop', url: 'https://github.com/SebastianPadin/ms_food.git'
+                git 'https://github.com/SebastianPadin/ms_food.git'
             }
         }
         stage('Compilar') {
@@ -17,6 +21,11 @@ pipeline {
         stage('Ejecutar Pruebas Unitarias') {
             steps {
                 bat 'mvn test'
+            }
+        }
+        stage('Analizar con SonarQube') {
+            steps {
+                bat 'mvn sonar:sonar -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_TOKEN'
             }
         }
         stage('Generar Artefacto') {
