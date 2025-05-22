@@ -1,14 +1,14 @@
-# Usa Java 17 JDK como base
-FROM amazoncorretto:17-alpine-jdk
-
-# Establece el directorio de trabajo
+# Etapa 1: Compilar con Maven
+FROM maven:3.9.4-amazoncorretto-17 AS build
 WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
 
-# Copia el JAR del proyecto
-COPY target/foods-0.0.1-SNAPSHOT.jar app.jar
+# Etapa 2: Crear la imagen final ligera
+FROM amazoncorretto:17-alpine-jdk
+WORKDIR /app
+COPY --from=build /app/target/foods-0.0.1-SNAPSHOT.jar app.jar
 
-# Expone el puerto (Render necesita esto aunque lo maneja internamente)
+# Render expone automáticamente el puerto 8080, asegúrate de usarlo
 EXPOSE 8080
-
-# Ejecuta la aplicación
 ENTRYPOINT ["java", "-jar", "app.jar"]
