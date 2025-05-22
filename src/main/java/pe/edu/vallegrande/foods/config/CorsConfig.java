@@ -21,7 +21,7 @@ public class CorsConfig {
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration corsConfig = new CorsConfiguration();
         corsConfig.addAllowedOrigin(
-            "http://localhost:4200"
+            "https://4200-vallegrande-vgwebdashbo-ya5bwcbfphb.ws-us118.gitpod.io"
         );
         corsConfig.addAllowedMethod("*");
         corsConfig.addAllowedHeader("*");
