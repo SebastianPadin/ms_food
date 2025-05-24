@@ -3,6 +3,8 @@ package pe.edu.vallegrande.FoodCost.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -32,32 +34,16 @@ public class InsertCostService {
     public Mono<Void> addFoodCost(FoodCostRequestDto request) {
         System.out.println("Request recibido: " + request);
 
-        return Mono.zip(getFood(request), getHensById(request))
-                .flatMap(tuple -> processFoodCost(tuple.getT1(), tuple.getT2(), request));
+        return Mono.zip(getFood(request), getHensById(request)).flatMap(tuple -> processFoodCost(tuple.getT1(), tuple.getT2(), request));
     }
 
     private Mono<FoodDto> getFood(FoodCostRequestDto request) {
-        return webClient.get()
-                .uri(foodServiceUrl)
-                .retrieve()
-                .bodyToFlux(FoodDto.class)
-                .filter(f -> f.getId_food().equals(request.getFoodId()))
-                .next()
-                .switchIfEmpty(Mono.error(new RuntimeException(
-                        "No se encontró alimento con ID: " + request.getFoodId())));
+        return webClient.get().uri(foodServiceUrl).retrieve().bodyToFlux(FoodDto.class).filter(f -> f.getId_food().equals(request.getFoodId())).next().switchIfEmpty(Mono.error(new RuntimeException("No se encontró alimento con ID: " + request.getFoodId())));
     }
 
     // Método actualizado que recibe FoodCostRequestDto
     private Mono<HensDto> getHensById(FoodCostRequestDto request) {
-        return webClient.get()
-                .uri(hensServiceUrl)
-                .retrieve()
-                .bodyToFlux(HensDto.class)
-                .filter(h -> h.getId().equals(request.getHensId()) &&
-                        !h.getArrivalDate().isAfter(LocalDate.now()))
-                .next()
-                .switchIfEmpty(Mono.error(new RuntimeException(
-                        "No se encontró gallina con ID: " + request.getHensId())));
+        return webClient.get().uri(hensServiceUrl).retrieve().bodyToFlux(HensDto.class).filter(h -> h.getId().equals(request.getHensId()) && !h.getArrivalDate().isAfter(LocalDate.now())).next().switchIfEmpty(Mono.error(new RuntimeException("No se encontró gallina con ID: " + request.getHensId())));
     }
 
     private Mono<Void> processFoodCost(FoodDto food, HensDto hens, FoodCostRequestDto request) {
@@ -65,8 +51,7 @@ public class InsertCostService {
         System.out.println("Gallinas seleccionadas: " + hens);
 
         if (food.getAmount() == null || BigDecimal.valueOf(food.getAmount()).compareTo(BigDecimal.ZERO) == 0) {
-            return Mono.error(new RuntimeException(
-                    "Cantidad inválida de alimento con ID: " + request.getFoodId()));
+            return Mono.error(new RuntimeException("Cantidad inválida de alimento con ID: " + request.getFoodId()));
         }
 
         BigDecimal totalKg = calculateTotalKg(request.getGramsPerChicken(), request.getQuantity());
@@ -82,9 +67,7 @@ public class InsertCostService {
     }
 
     private BigDecimal calculateTotalKg(BigDecimal gramsPerChicken, int quantity) {
-        return gramsPerChicken.multiply(BigDecimal.valueOf(quantity))
-                .multiply(BigDecimal.valueOf(7))
-                .divide(BigDecimal.valueOf(1000), 2, RoundingMode.HALF_UP);
+        return gramsPerChicken.multiply(BigDecimal.valueOf(quantity)).multiply(BigDecimal.valueOf(7)).divide(BigDecimal.valueOf(1000), 2, RoundingMode.HALF_UP);
     }
 
     private BigDecimal calculateCostPerKg(BigDecimal unitPrice, BigDecimal amount) {
@@ -95,36 +78,31 @@ public class InsertCostService {
         return totalKg.multiply(costPerKg).setScale(2, RoundingMode.HALF_UP);
     }
 
-    private Mono<Void> saveFoodCost(FoodCostRequestDto request, BigDecimal totalKg, BigDecimal totalCost,
-                                    HensDto hens) {
-        return foodCostsRepository.findTopByShedIdOrderByStartDateDesc(hens.getShedId())
-                .switchIfEmpty(Mono.defer(() -> {
-                    LocalDate startDate = hens.getArrivalDate();
-                    LocalDate endDate = calculateEndDate(startDate);
-                    FoodCost foodCost = buildFoodCost(request, totalKg, totalCost, startDate, endDate, hens);
+    private Mono<Void> saveFoodCost(FoodCostRequestDto request, BigDecimal totalKg, BigDecimal totalCost, HensDto hens) {
+        return foodCostsRepository.findTopByShedIdOrderByStartDateDesc(hens.getShedId()).switchIfEmpty(Mono.defer(() -> {
+            LocalDate startDate = hens.getArrivalDate();
+            LocalDate endDate = calculateEndDate(startDate);
+            FoodCost foodCost = buildFoodCost(request, totalKg, totalCost, startDate, endDate, hens);
 
-                    System.out.println("Registro FoodCost inicial para galpón " + hens.getShedId() + ": " + foodCost);
+            System.out.println("Registro FoodCost inicial para galpón " + hens.getShedId() + ": " + foodCost);
 
-                    return saveAndLogFoodCost(foodCost, true);
-                }))
-                .flatMap(lastFoodCost -> {
-                    LocalDate startDate = lastFoodCost.getEndDate().plusDays(1);
-                    LocalDate endDate = calculateEndDate(startDate);
-                    FoodCost foodCost = buildFoodCost(request, totalKg, totalCost, startDate, endDate, hens);
+            return saveAndLogFoodCost(foodCost, true);
+        })).flatMap(lastFoodCost -> {
+            LocalDate startDate = lastFoodCost.getEndDate().plusDays(1);
+            LocalDate endDate = calculateEndDate(startDate);
+            FoodCost foodCost = buildFoodCost(request, totalKg, totalCost, startDate, endDate, hens);
 
-                    System.out.println("Registro FoodCost nuevo para galpón " + hens.getShedId() + ": " + foodCost);
+            System.out.println("Registro FoodCost nuevo para galpón " + hens.getShedId() + ": " + foodCost);
 
-                    return saveAndLogFoodCost(foodCost, false);
-                })
-                .then();
+            return saveAndLogFoodCost(foodCost, false);
+        }).then();
     }
 
     private LocalDate calculateEndDate(LocalDate startDate) {
         return startDate.plusDays(6);
     }
 
-    private FoodCost buildFoodCost(FoodCostRequestDto request, BigDecimal totalKg, BigDecimal totalCost,
-                                   LocalDate startDate, LocalDate endDate, HensDto hens) {
+    private FoodCost buildFoodCost(FoodCostRequestDto request, BigDecimal totalKg, BigDecimal totalCost, LocalDate startDate, LocalDate endDate, HensDto hens) {
         FoodCost foodCost = new FoodCost();
         foodCost.setWeekNumber(request.getWeekNumber());
         foodCost.setFoodType(request.getFoodType());
@@ -140,15 +118,12 @@ public class InsertCostService {
     }
 
     private Mono<FoodCost> saveAndLogFoodCost(FoodCost foodCost, boolean isInitial) {
-        return foodCostsRepository.save(foodCost)
-                .doOnSuccess(saved -> {
-                    String msg = isInitial ? "Registro inicial guardado" : "Registro guardado exitosamente";
-                    System.out.println(msg + ": " + saved);
-                })
-                .doOnError(error -> {
-                    String msg = isInitial ? "Error al guardar registro inicial" : "Error al guardar el registro";
-                    System.out.println(msg + ": " + error.getMessage());
-                });
-    }
+        return foodCostsRepository.save(foodCost).doOnSuccess(saved -> {
+            String msg = isInitial ? "Registro inicial guardado" : "Registro guardado exitosamente";
+            System.out.println(msg + ": " + saved);
+        }).doOnError(error -> {
+            String msg = isInitial ? "Error al guardar registro inicial" : "Error al guardar el registro";
+            System.out.println(msg + ": " + error.getMessage());
+        });
     }
 }

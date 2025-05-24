@@ -1,5 +1,14 @@
+# Etapa 1: Compilar con Maven
+FROM maven:3.9.4-amazoncorretto-17 AS build
+WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
+
+# Etapa 2: Crear la imagen final ligera
 FROM amazoncorretto:17-alpine-jdk
+WORKDIR /app
+COPY --from=build /app/target/FoodCost-0.0.1-SNAPSHOT.jar app.jar
 
-COPY target/FoodCost-0.0.1-SNAPSHOT.jar /api-v1.jar
-
-ENTRYPOINT ["java", "-jar", "/api-v1.jar"]
+# Render expone automáticamente el puerto 8080, asegúrate de usarlo
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
