@@ -22,16 +22,16 @@ pipeline {
                 sh 'mvn test'
             }
         }
-        stage('Analizar con SonarQube') {
+       stage('Analizar con SonarQube') {
             steps {
                 withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                    sh """
-                        mvn sonar:sonar ^
-                          -Dsonar.projectKey=SebastianPadin_ms_food ^
-                          -Dsonar.organization=sebastianpadin ^
-                          -Dsonar.host.url=%SONAR_HOST_URL% ^
-                          -Dsonar.login=%SONAR_TOKEN%
-                    """
+                    sh '''
+                        mvn sonar:sonar \
+                          -Dsonar.projectKey=SebastianPadin_ms_food \
+                          -Dsonar.organization=sebastianpadin \
+                          -Dsonar.host.url=$SONAR_HOST_URL \
+                          -Dsonar.login=$SONAR_TOKEN
+                    '''
                 }
             }
         }
