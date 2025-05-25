@@ -25,7 +25,13 @@ pipeline {
         stage('Analizar con SonarQube') {
             steps {
                 withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                    sh 'mvn sonar:sonar -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=%SONAR_TOKEN%'
+                    bat """
+                        mvn sonar:sonar ^
+                          -Dsonar.projectKey=SebastianPadin_ms_food ^
+                          -Dsonar.organization=sebastianpadin ^
+                          -Dsonar.host.url=%SONAR_HOST_URL% ^
+                          -Dsonar.login=%SONAR_TOKEN%
+                    """
                 }
             }
         }
