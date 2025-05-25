@@ -14,18 +14,18 @@ pipeline {
         }
         stage('Compilar') {
             steps {
-                bat 'mvn clean install -DskipTests'
+                sh 'mvn clean install -DskipTests'
             }
         }
         stage('Ejecutar Pruebas Unitarias') {
             steps {
-                bat 'mvn test'
+                sh 'mvn test'
             }
         }
         stage('Analizar con SonarQube') {
             steps {
                 withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                    bat 'mvn sonar:sonar -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=%SONAR_TOKEN%'
+                    sh 'mvn sonar:sonar -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=%SONAR_TOKEN%'
                 }
             }
         }
