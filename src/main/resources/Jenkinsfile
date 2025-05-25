@@ -4,7 +4,7 @@ pipeline {
         maven 'Maven3'
     }
     environment {
-        SONAR_HOST_URL = 'http://localhost:9000'
+        SONAR_HOST_URL = 'https://sonarcloud.io'
     }
     stages {
         stage('Clonar Repositorio') {
@@ -25,7 +25,7 @@ pipeline {
         stage('Analizar con SonarQube') {
             steps {
                 withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                    bat 'mvn sonar:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.login=%SONAR_TOKEN%'
+                    bat 'mvn sonar:sonar -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=%SONAR_TOKEN%'
                 }
             }
         }
