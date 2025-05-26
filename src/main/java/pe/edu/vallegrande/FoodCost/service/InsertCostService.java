@@ -4,10 +4,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import lombok.RequiredArgsConstructor;
 import pe.edu.vallegrande.FoodCost.dto.reception.FoodDto;
@@ -15,6 +13,8 @@ import pe.edu.vallegrande.FoodCost.dto.reception.HensDto;
 import pe.edu.vallegrande.FoodCost.dto.transfer.FoodCostRequestDto;
 import pe.edu.vallegrande.FoodCost.model.FoodCost;
 import pe.edu.vallegrande.FoodCost.repository.FoodCostsRepository;
+import pe.edu.vallegrande.FoodCost.webclient.client.FoodClient;
+import pe.edu.vallegrande.FoodCost.webclient.client.HensClient;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -22,28 +22,16 @@ import reactor.core.publisher.Mono;
 @Transactional
 public class InsertCostService {
 
-    private final WebClient webClient;
+    private final FoodClient foodClient;
+    private final HensClient hensClient;
     private final FoodCostsRepository foodCostsRepository;
-
-    @Value("${api.food-service-url}")
-    private String foodServiceUrl;
-
-    @Value("${api.hens-service-url}")
-    private String hensServiceUrl;
 
     public Mono<Void> addFoodCost(FoodCostRequestDto request) {
         System.out.println("Request recibido: " + request);
-
-        return Mono.zip(getFood(request), getHensById(request)).flatMap(tuple -> processFoodCost(tuple.getT1(), tuple.getT2(), request));
-    }
-
-    private Mono<FoodDto> getFood(FoodCostRequestDto request) {
-        return webClient.get().uri(foodServiceUrl).retrieve().bodyToFlux(FoodDto.class).filter(f -> f.getId_food().equals(request.getFoodId())).next().switchIfEmpty(Mono.error(new RuntimeException("No se encontró alimento con ID: " + request.getFoodId())));
-    }
-
-    // Método actualizado que recibe FoodCostRequestDto
-    private Mono<HensDto> getHensById(FoodCostRequestDto request) {
-        return webClient.get().uri(hensServiceUrl).retrieve().bodyToFlux(HensDto.class).filter(h -> h.getId().equals(request.getHensId()) && !h.getArrivalDate().isAfter(LocalDate.now())).next().switchIfEmpty(Mono.error(new RuntimeException("No se encontró gallina con ID: " + request.getHensId())));
+        return Mono.zip(
+                foodClient.findFoodById(request.getFoodId()),
+                hensClient.findHensById(request.getHensId())
+        ).flatMap(tuple -> processFoodCost(tuple.getT1(), tuple.getT2(), request));
     }
 
     private Mono<Void> processFoodCost(FoodDto food, HensDto hens, FoodCostRequestDto request) {

@@ -2,12 +2,9 @@ package pe.edu.vallegrande.FoodCost.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import lombok.RequiredArgsConstructor;
 import pe.edu.vallegrande.FoodCost.dto.reception.FoodDto;
@@ -15,6 +12,8 @@ import pe.edu.vallegrande.FoodCost.dto.reception.HensDto;
 import pe.edu.vallegrande.FoodCost.dto.transfer.FoodCostRequestDto;
 import pe.edu.vallegrande.FoodCost.model.FoodCost;
 import pe.edu.vallegrande.FoodCost.repository.FoodCostsRepository;
+import pe.edu.vallegrande.FoodCost.webclient.client.FoodClient;
+import pe.edu.vallegrande.FoodCost.webclient.client.HensClient;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
@@ -24,14 +23,9 @@ import reactor.util.function.Tuple2;
 @Transactional
 public class UpdateCostService {
 
-    private final WebClient webClient;
+    private final FoodClient foodClient;
+    private final HensClient hensClient;
     private final FoodCostsRepository foodCostsRepository;
-
-    @Value("${api.food-service-url}")
-    private String foodServiceUrl;
-
-    @Value("${api.hens-service-url}")
-    private String hensServiceUrl;
 
     public Mono<Void> updateFoodCost(Long idFoodCosts, FoodCostRequestDto request) {
         return foodCostsRepository.findById(idFoodCosts)
@@ -65,28 +59,10 @@ public class UpdateCostService {
     }
 
     private Mono<Tuple2<FoodDto, HensDto>> getFoodAndHensData(FoodCostRequestDto request) {
-        // Actualizamos el filtro para el alimento utilizando el ID, igual a lo realizado en InsertCostService.
-        Mono<FoodDto> foodMono = webClient.get()
-                .uri(foodServiceUrl)
-                .retrieve()
-                .bodyToFlux(FoodDto.class)
-                .filter(f -> f.getId_food().equals(request.getFoodId()))
-                .next()
-                .switchIfEmpty(Mono.error(new RuntimeException(
-                        "❌ No se encontró alimento con ID: " + request.getFoodId())));
-
-        // Actualizamos el filtro para las gallinas utilizando el ID (y no el shedId) y validamos la fecha, igual que en InsertCostService.
-        Mono<HensDto> hensMono = webClient.get()
-                .uri(hensServiceUrl)
-                .retrieve()
-                .bodyToFlux(HensDto.class)
-                .filter(h -> h.getId().equals(request.getHensId()))
-                .filter(h -> !h.getArrivalDate().isAfter(LocalDate.now()))
-                .next()
-                .switchIfEmpty(Mono.error(new RuntimeException(
-                        "❌ No se encontró gallina con ID: " + request.getHensId())));
-
-        return Mono.zip(foodMono, hensMono);
+        return Mono.zip(
+                foodClient.findFoodById(request.getFoodId()),
+                hensClient.findHensById(request.getHensId())
+        );
     }
 
     private void validateFoodAmount(Integer amount) {
