@@ -3,16 +3,17 @@ package pe.edu.vallegrande.foods.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pe.edu.vallegrande.foods.dto.FoodRequest;
+import pe.edu.vallegrande.foods.exception.FoodInactiveException;
+import pe.edu.vallegrande.foods.exception.FoodNotFoundException;
 import pe.edu.vallegrande.foods.model.Food;
 import pe.edu.vallegrande.foods.repository.FoodRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-@RequiredArgsConstructor    
+@RequiredArgsConstructor
 public class FoodService {
 
-    
     private final FoodRepository foodRepository;
 
     // Método para obtener todos los alimentos
@@ -49,6 +50,7 @@ public class FoodService {
     // Método para actualizar un alimento
     public Mono<Food> updateFood(Long id, FoodRequest foodRequest) {
         return foodRepository.findById(id)
+                .switchIfEmpty(Mono.error(new FoodNotFoundException("Food not found")))
                 .flatMap(existingFood -> {
                     if ("A".equals(existingFood.getStatus())) {
                         existingFood.setFoodType(foodRequest.getFoodType());
@@ -58,35 +60,33 @@ public class FoodService {
                         existingFood.setUnitMeasure(foodRequest.getUnitMeasure());
                         return foodRepository.save(existingFood);
                     }
-                    return Mono.error(new RuntimeException("No se puede editar un alimento con estado inactivo"));
+                    return Mono.error(new FoodInactiveException("Cannot update inactive food"));
                 });
     }
 
     // Método para eliminar un alimento lógicamente
     public Mono<Food> deleteFoodLogically(Long id) {
         return foodRepository.findById(id)
+                .switchIfEmpty(Mono.error(new FoodNotFoundException("Food not found")))
                 .flatMap(existingFood -> {
                     if ("A".equals(existingFood.getStatus())) {
                         existingFood.setStatus("I");
                         return foodRepository.save(existingFood);
-                    } else {
-                        return Mono.error(new RuntimeException("Food is already inactive"));
                     }
-                })
-                .switchIfEmpty(Mono.error(new RuntimeException("Food not found")));
+                    return Mono.error(new FoodInactiveException("Food is already inactive"));
+                });
     }
 
     // Método para restaurar un alimento (cambiar estado de 'I' a 'A')
     public Mono<Food> restoreFood(Long id) {
         return foodRepository.findById(id)
+                .switchIfEmpty(Mono.error(new FoodNotFoundException("Food not found")))
                 .flatMap(existingFood -> {
                     if ("I".equals(existingFood.getStatus())) {
                         existingFood.setStatus("A");
                         return foodRepository.save(existingFood);
-                    } else {
-                        return Mono.error(new RuntimeException("Food is already active"));
                     }
-                })
-                .switchIfEmpty(Mono.error(new RuntimeException("Food not found")));
+                    return Mono.error(new FoodInactiveException("Food is already active"));
+                });
     }
 }
