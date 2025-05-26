@@ -47,28 +47,28 @@ public class FoodController {
     @PostMapping
     public Mono<ResponseEntity<Food>> createFood(@RequestBody FoodRequest request) {
         return foodService.createFood(request)
-                .map(food -> ResponseEntity.ok(food))
+                .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.badRequest().build());
     }
 
     @PutMapping("/{id}")
     public Mono<ResponseEntity<Food>> updateFood(@PathVariable Long id, @RequestBody FoodRequest foodRequest) {
         return foodService.updateFood(id, foodRequest)
-                .map(updatedFood -> ResponseEntity.ok(updatedFood))
+                .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/delete/{id}")
     public Mono<ResponseEntity<Food>> deleteFoodLogically(@PathVariable Long id) {
         return foodService.deleteFoodLogically(id)
-                .map(deletedFood -> ResponseEntity.ok(deletedFood))
+                .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/restore/{id}")
     public Mono<ResponseEntity<Food>> restoreFood(@PathVariable Long id) {
         return foodService.restoreFood(id)
-                .map(restoredFood -> ResponseEntity.ok(restoredFood))
+                .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 }
