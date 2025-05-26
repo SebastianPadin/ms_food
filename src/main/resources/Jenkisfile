@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+    tools {
+        maven 'Maven3'
+    }
+    environment {
+        SONAR_HOST_URL = 'https://sonarcloud.io'
+    }
+    stages {
+        stage('Clonar Repositorio') {
+            steps {
+                git branch: 'develop2', url: 'https://github.com/SebastianPadin/ms_food.git'
+            }
+        }
+        stage('Compilar') {
+            steps {
+                sh 'mvn clean install -DskipTests'
+            }
+        }
+        stage('Ejecutar Pruebas Unitarias') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+       stage('Analizar con SonarQube') {
+            steps {
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    sh '''
+                        mvn sonar:sonar \
+                          -Dsonar.projectKey=SebastianPadin_ms_food \
+                          -Dsonar.organization=sebastianpadin \
+                          -Dsonar.host.url=$SONAR_HOST_URL \
+                          -Dsonar.login=$SONAR_TOKEN
+                    '''
+                }
+            }
+        }
+        stage('Generar Artefacto') {
+            steps {
+                archiveArtifacts artifacts: '**/*.jar', fingerprint: true
+            }
+        }
+    }
+}
