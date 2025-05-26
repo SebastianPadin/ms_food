@@ -8,8 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import pe.edu.vallegrande.FoodCost.exception.FoodClientException;
-import pe.edu.vallegrande.FoodCost.exception.HensClientException;
+import pe.edu.vallegrande.FoodCost.exception.client.FoodClientException;
+import pe.edu.vallegrande.FoodCost.exception.client.HensClientException;
 
 @Configuration
 public class WebClientConfig {

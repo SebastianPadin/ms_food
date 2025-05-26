@@ -2,6 +2,8 @@ package pe.edu.vallegrande.FoodCost.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import pe.edu.vallegrande.FoodCost.exception.service.FoodCostInactiveException;
+import pe.edu.vallegrande.FoodCost.exception.service.FoodCostNotFoundException;
 import pe.edu.vallegrande.FoodCost.model.FoodCost;
 import pe.edu.vallegrande.FoodCost.repository.FoodCostsRepository;
 import reactor.core.publisher.Flux;
@@ -31,29 +33,27 @@ public class FoodCostsService {
     // Método para eliminar un costo de alimento lógicamente
     public Mono<FoodCost> deleteFoodCost(Long id) {
         return foodCostsRepository.findById(id)
+                .switchIfEmpty(Mono.error(new FoodCostNotFoundException("Record not found")))
                 .flatMap(existingFoodCosts -> {
                     if ("A".equals(existingFoodCosts.getStatus())) {
                         existingFoodCosts.setStatus("I");
                         return foodCostsRepository.save(existingFoodCosts);
-                    } else {
-                        return Mono.error(new RuntimeException("The registration is already inactive"));
                     }
-                })
-                .switchIfEmpty(Mono.error(new RuntimeException("Record not found")));
+                    return Mono.error(new FoodCostInactiveException("The registration is already inactive"));
+                });
     }
 
     // Método para restaurar el costo de alimento (cambiar estado de 'I' a 'A')
     public Mono<FoodCost> restoreFoodCosts(Long id) {
         return foodCostsRepository.findById(id)
+                .switchIfEmpty(Mono.error(new FoodCostNotFoundException("Record not found")))
                 .flatMap(existingFoodCosts -> {
                     if ("I".equals(existingFoodCosts.getStatus())) {
                         existingFoodCosts.setStatus("A");
                         return foodCostsRepository.save(existingFoodCosts);
-                    } else {
-                        return Mono.error(new RuntimeException("Record is already active"));
                     }
-                })
-                .switchIfEmpty(Mono.error(new RuntimeException("Record not found")));
+                    return Mono.error(new FoodCostInactiveException("Record is already active"));
+                });
     }
 
 }

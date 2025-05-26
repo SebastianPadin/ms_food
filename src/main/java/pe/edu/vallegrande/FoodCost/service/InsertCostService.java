@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import pe.edu.vallegrande.FoodCost.dto.reception.FoodDto;
 import pe.edu.vallegrande.FoodCost.dto.reception.HensDto;
 import pe.edu.vallegrande.FoodCost.dto.transfer.FoodCostRequestDto;
+import pe.edu.vallegrande.FoodCost.exception.service.InvalidFoodAmountException;
 import pe.edu.vallegrande.FoodCost.model.FoodCost;
 import pe.edu.vallegrande.FoodCost.repository.FoodCostsRepository;
 import pe.edu.vallegrande.FoodCost.webclient.client.FoodClient;
@@ -39,7 +40,7 @@ public class InsertCostService {
         System.out.println("Gallinas seleccionadas: " + hens);
 
         if (food.getAmount() == null || BigDecimal.valueOf(food.getAmount()).compareTo(BigDecimal.ZERO) == 0) {
-            return Mono.error(new RuntimeException("Cantidad inválida de alimento con ID: " + request.getFoodId()));
+            return Mono.error(new InvalidFoodAmountException("Cantidad inválida de alimento con ID: " + request.getFoodId()));
         }
 
         BigDecimal totalKg = calculateTotalKg(request.getGramsPerChicken(), request.getQuantity());

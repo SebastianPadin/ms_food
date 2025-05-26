@@ -10,13 +10,16 @@ import lombok.RequiredArgsConstructor;
 import pe.edu.vallegrande.FoodCost.dto.reception.FoodDto;
 import pe.edu.vallegrande.FoodCost.dto.reception.HensDto;
 import pe.edu.vallegrande.FoodCost.dto.transfer.FoodCostRequestDto;
+import pe.edu.vallegrande.FoodCost.exception.client.FoodClientException;
+import pe.edu.vallegrande.FoodCost.exception.client.HensClientException;
+import pe.edu.vallegrande.FoodCost.exception.service.FoodCostNotFoundException;
+import pe.edu.vallegrande.FoodCost.exception.service.FoodNotFoundException;
 import pe.edu.vallegrande.FoodCost.model.FoodCost;
 import pe.edu.vallegrande.FoodCost.repository.FoodCostsRepository;
 import pe.edu.vallegrande.FoodCost.webclient.client.FoodClient;
 import pe.edu.vallegrande.FoodCost.webclient.client.HensClient;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
-
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +32,7 @@ public class UpdateCostService {
 
     public Mono<Void> updateFoodCost(Long idFoodCosts, FoodCostRequestDto request) {
         return foodCostsRepository.findById(idFoodCosts)
-                .switchIfEmpty(Mono.error(new RuntimeException("No se encontró el registro con ID: " + idFoodCosts)))
+                .switchIfEmpty(Mono.error(new FoodCostNotFoundException("No se encontró el registro con ID: " + idFoodCosts)))
                 .flatMap(existing -> getFoodAndHensData(request)
                         .flatMap(tuple -> {
                             FoodDto food = tuple.getT1();
@@ -60,8 +63,11 @@ public class UpdateCostService {
 
     private Mono<Tuple2<FoodDto, HensDto>> getFoodAndHensData(FoodCostRequestDto request) {
         return Mono.zip(
-                foodClient.findFoodById(request.getFoodId()),
+                foodClient.findFoodById(request.getFoodId())
+                        .switchIfEmpty(Mono.error(new FoodNotFoundException("No se encontró el alimento con ID: " + request.getFoodId())))
+                        .onErrorMap(ex -> new FoodClientException("Error en la consulta del alimento: " + ex.getMessage())),
                 hensClient.findHensById(request.getHensId())
+                        .onErrorMap(ex -> new HensClientException("Error en la consulta de las gallinas: " + ex.getMessage()))
         );
     }
 
