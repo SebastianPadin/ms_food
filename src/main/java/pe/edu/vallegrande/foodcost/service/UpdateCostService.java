@@ -98,7 +98,8 @@ public class UpdateCostService {
         existing.setGramsPerChicken(request.getGramsPerChicken());
         existing.setTotalKg(totalKg);
         existing.setTotalCost(totalCost);
-        existing.setShedId(hens.getShedId()); 
         existing.setShedName(request.getShedName());
+        existing.setShedId(hens.getShedId());
+        existing.setHensId(request.getHensId());
     }
 }

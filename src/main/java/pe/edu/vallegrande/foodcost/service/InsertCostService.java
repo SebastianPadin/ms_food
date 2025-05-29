@@ -101,8 +101,9 @@ public class InsertCostService {
         foodCost.setTotalCost(totalCost);
         foodCost.setStartDate(startDate);
         foodCost.setEndDate(endDate);
-        foodCost.setShedId(hens.getShedId());
         foodCost.setShedName(request.getShedName());
+        foodCost.setShedId(hens.getShedId());
+        foodCost.setHensId(request.getHensId());
         foodCost.setStatus("A");
         return foodCost;
     }

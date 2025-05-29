@@ -35,11 +35,14 @@ public class FoodCost {
     @Column("end_date")
     private LocalDate endDate;
 
+    @Column("shed_name")
+    private String shedName;
+
     @Column("shed_id")
     private Long shedId;
 
-    @Column("shed_name")
-    private String shedName;
+    @Column("hens_id")
+    private Long hensId;
     
     @Column("status")
     private String status;
