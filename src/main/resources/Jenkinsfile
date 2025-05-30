@@ -28,7 +28,7 @@ pipeline {
                     sh '''
                         mvn sonar:sonar \
                           -Dsonar.projectKey=SebastianPadin_ms_food \
-                          -Dsonar.organization=sebastianpadin \
+                          -Dsonar.organization=72495068 \
                           -Dsonar.host.url=$SONAR_HOST_URL \
                           -Dsonar.login=$SONAR_TOKEN
                     '''
