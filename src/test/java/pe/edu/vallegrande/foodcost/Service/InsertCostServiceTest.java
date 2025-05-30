@@ -74,7 +74,7 @@ public class InsertCostServiceTest {
     public void testAddFoodCost_noExistingFoodCost() {
         // Datos falsos para FoodDto
         FoodDto foodDto = new FoodDto();
-        foodDto.setId_food(1L);
+        foodDto.setIdFood(1L);
         foodDto.setAmount(50);
 
         // Datos falsos para HensDto
@@ -121,7 +121,7 @@ public class InsertCostServiceTest {
     public void testAddFoodCost_existingFoodCost() {
         // Datos falsos para FoodDto
         FoodDto foodDto = new FoodDto();
-        foodDto.setId_food(1L);
+        foodDto.setIdFood(1L);
         foodDto.setAmount(25);
 
         // Datos falsos para HensDto
@@ -171,7 +171,7 @@ public class InsertCostServiceTest {
     public void testAddFoodCost_invalidFoodAmount() {
         // Creamos FoodDto con cantidad inválida (cero)
         FoodDto foodDto = new FoodDto();
-        foodDto.setId_food(1L);
+        foodDto.setIdFood(1L);
         foodDto.setAmount(0);
 
         // Datos válidos para HensDto
@@ -216,7 +216,7 @@ public class InsertCostServiceTest {
     public void testAddFoodCost_hensNotFound() {
         // Datos falsos para FoodDto
         FoodDto foodDto = new FoodDto();
-        foodDto.setId_food(1L);
+        foodDto.setIdFood(1L);
         foodDto.setAmount(100);
 
         // Configuramos el request
