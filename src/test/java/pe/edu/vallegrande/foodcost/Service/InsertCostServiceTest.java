@@ -144,6 +144,7 @@ public class InsertCostServiceTest {
         // Creamos un registro previo falso para el galpón
         FoodCost existingFoodCost = new FoodCost();
         existingFoodCost.setStartDate(LocalDate.now().minusDays(8));
+        existingFoodCost.setEndDate(LocalDate.now().minusDays(1));
 
         // Simulación de la llamada a FoodClient
         when(foodClient.findFoodById(1L)).thenReturn(Mono.just(foodDto));
