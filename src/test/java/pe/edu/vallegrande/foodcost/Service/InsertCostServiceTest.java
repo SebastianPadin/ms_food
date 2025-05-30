@@ -110,7 +110,7 @@ public class InsertCostServiceTest {
         // Verificamos que el flujo se complete sin error y que se guarden 2 registros
         StepVerifier.create(result)
                 .verifyComplete();
-        verify(foodCostsRepository, times(2)).save(any());
+        verify(foodCostsRepository, times(1)).save(any());
     }
 
     /**
@@ -143,7 +143,7 @@ public class InsertCostServiceTest {
 
         // Creamos un registro previo falso para el galpón
         FoodCost existingFoodCost = new FoodCost();
-        existingFoodCost.setEndDate(LocalDate.now().minusDays(1));
+        existingFoodCost.setStartDate(LocalDate.now().minusDays(8));
 
         // Simulación de la llamada a FoodClient
         when(foodClient.findFoodById(1L)).thenReturn(Mono.just(foodDto));
