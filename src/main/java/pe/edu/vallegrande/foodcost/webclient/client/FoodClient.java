@@ -24,7 +24,7 @@ public class FoodClient {
                 .uri(foodServiceUrl)
                 .retrieve()
                 .bodyToFlux(FoodDto.class)
-                .filter(f -> f.getId_food().equals(foodId))
+                .filter(f -> f.getIdFood().equals(foodId))
                 .next()
                 .switchIfEmpty(Mono.error(new RuntimeException("No se encontró alimento con ID: " + foodId)));
     }
