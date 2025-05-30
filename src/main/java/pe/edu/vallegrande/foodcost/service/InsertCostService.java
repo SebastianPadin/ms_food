@@ -68,24 +68,27 @@ public class InsertCostService {
     }
 
     private Mono<Void> saveFoodCost(FoodCostRequestDto request, BigDecimal totalKg, BigDecimal totalCost, HensDto hens) {
-        return foodCostsRepository.findTopByShedIdOrderByStartDateDesc(hens.getShedId()).switchIfEmpty(Mono.<FoodCost>defer(() -> {
-            LocalDate startDate = hens.getArrivalDate();
-            LocalDate endDate = calculateEndDate(startDate);
-            FoodCost foodCost = buildFoodCost(request, totalKg, totalCost, startDate, endDate, hens);
+        return foodCostsRepository.findTopByShedIdOrderByStartDateDesc(hens.getShedId())
+                .flatMap(lastFoodCost -> {
+                    LocalDate expectedStartDate = lastFoodCost.getEndDate().plusDays(1);
+                    if (lastFoodCost.getStartDate().equals(expectedStartDate)) {
+                        System.out.println("Registro ya existente para el periodo: " + lastFoodCost);
+                        return Mono.empty(); // Evita la duplicación
+                    }
 
-            System.out.println("Registro FoodCost inicial para galpón " + hens.getShedId() + ": " + foodCost);
+                    LocalDate endDate = calculateEndDate(expectedStartDate);
+                    FoodCost foodCost = buildFoodCost(request, totalKg, totalCost, expectedStartDate, endDate, hens);
 
-            // Luego de guardar, devolvemos el objeto foodCost para seguir la cadena
-            return saveAndLogFoodCost(foodCost, true).thenReturn(foodCost);
-        })).flatMap(lastFoodCost -> {
-            LocalDate startDate = lastFoodCost.getEndDate().plusDays(1);
-            LocalDate endDate = calculateEndDate(startDate);
-            FoodCost foodCost = buildFoodCost(request, totalKg, totalCost, startDate, endDate, hens);
+                    System.out.println("Registro FoodCost nuevo para galpón " + hens.getShedId() + ": " + foodCost);
+                    return saveAndLogFoodCost(foodCost, false);
+                }).switchIfEmpty(Mono.defer(() -> {
+                    LocalDate startDate = hens.getArrivalDate();
+                    LocalDate endDate = calculateEndDate(startDate);
+                    FoodCost foodCost = buildFoodCost(request, totalKg, totalCost, startDate, endDate, hens);
 
-            System.out.println("Registro FoodCost nuevo para galpón " + hens.getShedId() + ": " + foodCost);
-
-            return saveAndLogFoodCost(foodCost, false);
-        }).then();
+                    System.out.println("Registro FoodCost inicial para galpón " + hens.getShedId() + ": " + foodCost);
+                    return saveAndLogFoodCost(foodCost, true);
+                })).then();
     }
 
     private LocalDate calculateEndDate(LocalDate startDate) {
