@@ -33,7 +33,7 @@ public class FoodServiceTest {
     void testGetAllActiveFoods() {
         // 👉 Paso 1: Crear alimento simulado con estado "A"
         Food food = new Food();
-        food.setId_food(1L);
+        food.setIdFood(1L);
         food.setFoodType("Crecimiento");
         food.setFoodBrand("Avifort");
         food.setAmount(50);
@@ -61,7 +61,7 @@ public class FoodServiceTest {
         // Fake input request
         FoodRequest request = new FoodRequest("Postura", "Dekalb Brown", 25, "Saco", "kg");
         Food fakeSavedFood = new Food();
-        fakeSavedFood.setId_food(1L);
+        fakeSavedFood.setIdFood(1L);
         fakeSavedFood.setStatus("A");
         fakeSavedFood.setFoodType("Postura");
         fakeSavedFood.setFoodBrand("Dekalb Brown");
@@ -87,7 +87,7 @@ public class FoodServiceTest {
     void testDeleteFoodLogically() {
         // 👉 Paso 1: Arrange - Crear un alimento simulado (activo)
         Food existingFood = new Food();
-        existingFood.setId_food(1L);
+        existingFood.setIdFood(1L);
         existingFood.setStatus("A");
         existingFood.setFoodType("Bread");
         existingFood.setFoodBrand("BrandZ");
@@ -100,7 +100,7 @@ public class FoodServiceTest {
 
         // 👉 Paso 3: Simular la respuesta del save con el estado actualizado a "I"
         Food deletedFood = new Food();
-        deletedFood.setId_food(1L);
+        deletedFood.setIdFood(1L);
         deletedFood.setStatus("I"); // Simulamos que el servicio cambia el estado
         deletedFood.setFoodType("Bread");
         deletedFood.setFoodBrand("BrandZ");

@@ -11,7 +11,7 @@ import java.time.LocalDate;
 public class Food {
     @Id
     @Column("id_food")
-    private Long id_food;
+    private Long idFood;
 
     @Column("food_type")
     private String foodType;

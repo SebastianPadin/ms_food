@@ -2,14 +2,7 @@ package pe.edu.vallegrande.foods.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pe.edu.vallegrande.foods.model.Food;
 import pe.edu.vallegrande.foods.dto.FoodRequest;
 import pe.edu.vallegrande.foods.service.FoodService;
@@ -70,5 +63,11 @@ public class FoodController {
         return foodService.restoreFood(id)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/delete/physical/{id}")
+    public Mono<ResponseEntity<Void>> deleteFoodPhysically(@PathVariable Long id) {
+        return foodService.deleteFoodPhysically(id)
+                .thenReturn(ResponseEntity.noContent().build());
     }
 }
