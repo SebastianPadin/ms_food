@@ -12,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import pe.edu.vallegrande.foodcost.dto.reception.FoodDto;
@@ -21,7 +20,8 @@ import pe.edu.vallegrande.foodcost.dto.transfer.FoodCostRequestDto;
 import pe.edu.vallegrande.foodcost.model.FoodCost;
 import pe.edu.vallegrande.foodcost.repository.FoodCostsRepository;
 import pe.edu.vallegrande.foodcost.service.InsertCostService;
-import reactor.core.publisher.Flux;
+import pe.edu.vallegrande.foodcost.webclient.client.FoodClient;
+import pe.edu.vallegrande.foodcost.webclient.client.HensClient;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -33,6 +33,12 @@ public class InsertCostServiceTest {
 
     @Mock
     private FoodCostsRepository foodCostsRepository;
+
+    @Mock
+    private FoodClient foodClient;
+
+    @Mock
+    private HensClient hensClient;
 
     @InjectMocks
     private InsertCostService insertCostService;
@@ -55,10 +61,6 @@ public class InsertCostServiceTest {
 
     @BeforeEach
     public void setUp() {
-        // Inyectamos manualmente los valores para las URLs (los que declara @Value en el servicio)
-        ReflectionTestUtils.setField(insertCostService, "foodServiceUrl", "http://fake-food-service");
-        ReflectionTestUtils.setField(insertCostService, "hensServiceUrl", "http://fake-hens-service");
-
         // Para el repositorio, stub para que al guardar retorne el objeto guardado
         lenient().when(foodCostsRepository.save(any(FoodCost.class)))
                 .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
@@ -92,25 +94,11 @@ public class InsertCostServiceTest {
         request.setWeekNumber("Semana 1");
         request.setShedName("Galpon A");
 
-        // Simulación de la cadena de llamadas para alimento:
-        // La primera invocación de webClient.get() se usará para el alimento y la segunda para gallinas.
-        when(webClient.get())
-                .thenReturn(foodRequestHeadersUriSpec)
-                .thenReturn(hensRequestHeadersUriSpec);
-        when(foodRequestHeadersUriSpec.uri("http://fake-food-service"))
-                .thenReturn(foodRequestHeadersSpec);
-        when(foodRequestHeadersSpec.retrieve())
-                .thenReturn(foodResponseSpec);
-        when(foodResponseSpec.bodyToFlux(FoodDto.class))
-                .thenReturn(Flux.just(foodDto));
+        // Simulación de la llamada a FoodClient
+        when(foodClient.findFoodById(1L)).thenReturn(Mono.just(foodDto));
 
-        // Simulación de la cadena para gallinas:
-        when(hensRequestHeadersUriSpec.uri("http://fake-hens-service"))
-                .thenReturn(hensRequestHeadersSpec);
-        when(hensRequestHeadersSpec.retrieve())
-                .thenReturn(hensResponseSpec);
-        when(hensResponseSpec.bodyToFlux(HensDto.class))
-                .thenReturn(Flux.just(hensDto));
+        // Simulación de la llamada a HensClient
+        when(hensClient.findHensById(1L)).thenReturn(Mono.just(hensDto));
 
         // No existe un registro previo para el galpón, por lo que el repositorio retorna Mono.empty()
         when(foodCostsRepository.findTopByShedIdOrderByStartDateDesc(1L))
@@ -157,22 +145,11 @@ public class InsertCostServiceTest {
         FoodCost existingFoodCost = new FoodCost();
         existingFoodCost.setEndDate(LocalDate.now().minusDays(1));
 
-        // Simulación de la cadena para alimento y gallinas
-        when(webClient.get())
-                .thenReturn(foodRequestHeadersUriSpec)
-                .thenReturn(hensRequestHeadersUriSpec);
-        when(foodRequestHeadersUriSpec.uri("http://fake-food-service"))
-                .thenReturn(foodRequestHeadersSpec);
-        when(foodRequestHeadersSpec.retrieve())
-                .thenReturn(foodResponseSpec);
-        when(foodResponseSpec.bodyToFlux(FoodDto.class))
-                .thenReturn(Flux.just(foodDto));
-        when(hensRequestHeadersUriSpec.uri("http://fake-hens-service"))
-                .thenReturn(hensRequestHeadersSpec);
-        when(hensRequestHeadersSpec.retrieve())
-                .thenReturn(hensResponseSpec);
-        when(hensResponseSpec.bodyToFlux(HensDto.class))
-                .thenReturn(Flux.just(hensDto));
+        // Simulación de la llamada a FoodClient
+        when(foodClient.findFoodById(1L)).thenReturn(Mono.just(foodDto));
+
+        // Simulación de la llamada a HensClient
+        when(hensClient.findHensById(4L)).thenReturn(Mono.just(hensDto));
 
         // El repositorio retorna un registro previo para el galpón
         when(foodCostsRepository.findTopByShedIdOrderByStartDateDesc(5L))
@@ -214,24 +191,16 @@ public class InsertCostServiceTest {
         request.setWeekNumber("Semana 2");
         request.setShedName("Galpon B");
 
-        when(webClient.get())
-                .thenReturn(foodRequestHeadersUriSpec)
-                .thenReturn(hensRequestHeadersUriSpec);
-        when(foodRequestHeadersUriSpec.uri("http://fake-food-service"))
-                .thenReturn(foodRequestHeadersSpec);
-        when(foodRequestHeadersSpec.retrieve())
-                .thenReturn(foodResponseSpec);
-        when(foodResponseSpec.bodyToFlux(FoodDto.class))
-                .thenReturn(Flux.just(foodDto));
-        when(hensRequestHeadersUriSpec.uri("http://fake-hens-service"))
-                .thenReturn(hensRequestHeadersSpec);
-        when(hensRequestHeadersSpec.retrieve())
-                .thenReturn(hensResponseSpec);
-        when(hensResponseSpec.bodyToFlux(HensDto.class))
-                .thenReturn(Flux.just(hensDto));
+        // Simulación de la llamada a FoodClient con cantidad inválida
+        when(foodClient.findFoodById(1L)).thenReturn(Mono.just(foodDto));
 
+        // Simulación de la llamada a HensClient con datos válidos
+        when(hensClient.findHensById(1L)).thenReturn(Mono.just(hensDto));
+
+        // Ejecutamos el método a probar
         Mono<Void> result = insertCostService.addFoodCost(request);
 
+        // Validamos que se lance una excepción por cantidad inválida de alimento
         StepVerifier.create(result)
                 .expectErrorMatches(throwable ->
                         throwable instanceof RuntimeException &&
@@ -261,27 +230,16 @@ public class InsertCostServiceTest {
         request.setWeekNumber("Semana 22");
         request.setShedName("Galpon B");
 
-        // Simulación para alimento
-        when(webClient.get())
-                .thenReturn(foodRequestHeadersUriSpec)
-                .thenReturn(hensRequestHeadersUriSpec);
-        when(foodRequestHeadersUriSpec.uri("http://fake-food-service"))
-                .thenReturn(foodRequestHeadersSpec);
-        when(foodRequestHeadersSpec.retrieve())
-                .thenReturn(foodResponseSpec);
-        when(foodResponseSpec.bodyToFlux(FoodDto.class))
-                .thenReturn(Flux.just(foodDto));
+        // Simulación de la llamada a FoodClient
+        when(foodClient.findFoodById(1L)).thenReturn(Mono.just(foodDto));
 
-        // Para gallinas, retornamos flujo vacío para simular que no se encontró la gallina
-        when(hensRequestHeadersUriSpec.uri("http://fake-hens-service"))
-                .thenReturn(hensRequestHeadersSpec);
-        when(hensRequestHeadersSpec.retrieve())
-                .thenReturn(hensResponseSpec);
-        when(hensResponseSpec.bodyToFlux(HensDto.class))
-                .thenReturn(Flux.empty());
+        // Simulación de la llamada a HensClient con flujo vacío para indicar que no se encontró la gallina
+        when(hensClient.findHensById(2L)).thenReturn(Mono.error(new RuntimeException("No se encontró gallina")));
 
+        // Ejecutamos el método a probar
         Mono<Void> result = insertCostService.addFoodCost(request);
 
+        // Validamos que se lance una excepción por gallina no encontrada
         StepVerifier.create(result)
                 .expectErrorMatches(throwable ->
                         throwable instanceof RuntimeException &&

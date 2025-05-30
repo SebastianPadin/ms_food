@@ -56,4 +56,10 @@ public class FoodCostsService {
                 });
     }
 
+    // Método para eliminar un costo de alimento físicamente
+    public Mono<Void> deleteFoodCostPhysically(Long id) {
+        return foodCostsRepository.findById(id)
+                .switchIfEmpty(Mono.error(new FoodCostNotFoundException("Record not found")))
+                .flatMap(existingFoodCost -> foodCostsRepository.deleteById(id));
+    }
 }

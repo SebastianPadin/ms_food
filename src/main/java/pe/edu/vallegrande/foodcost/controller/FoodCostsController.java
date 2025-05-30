@@ -4,14 +4,7 @@ import lombok.AllArgsConstructor;
 import java.util.Collections;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pe.edu.vallegrande.foodcost.model.FoodCost;
 import pe.edu.vallegrande.foodcost.service.FoodCostsService;
 import pe.edu.vallegrande.foodcost.service.UpdateCostService;
@@ -76,4 +69,9 @@ public class FoodCostsController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
+    @DeleteMapping("/delete/physical/{id}")
+    public Mono<ResponseEntity<Void>> deleteFoodCostPhysically(@PathVariable Long id) {
+        return foodCostsService.deleteFoodCostPhysically(id)
+                .thenReturn(ResponseEntity.noContent().build());
+    }
 }
