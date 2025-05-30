@@ -40,7 +40,6 @@
 		<dependency>
 			<groupId>io.projectreactor</groupId>
 			<artifactId>reactor-test</artifactId>
-			<version>3.5.2</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- Spring Boot Starter Data R2DBC for reactive database access -->
@@ -58,8 +57,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.24</version>
-			<scope>provided</scope>
+			<scope>true</scope>
 		</dependency>
 		<!-- Spring Boot Starter Test (incluye JUnit 5, Mockito, etc.) -->
 		<dependency>
