@@ -21,7 +21,7 @@ import pe.edu.vallegrande.foods.model.Food;
 import pe.edu.vallegrande.foods.repository.FoodRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class FoodServiceTest {
+class FoodServiceTest {
 
     @Mock
     private FoodRepository foodRepository;
