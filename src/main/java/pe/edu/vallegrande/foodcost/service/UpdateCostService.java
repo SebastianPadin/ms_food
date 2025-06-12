@@ -14,6 +14,7 @@ import pe.edu.vallegrande.foodcost.exception.client.FoodClientException;
 import pe.edu.vallegrande.foodcost.exception.client.HensClientException;
 import pe.edu.vallegrande.foodcost.exception.service.FoodCostNotFoundException;
 import pe.edu.vallegrande.foodcost.exception.service.FoodNotFoundException;
+import pe.edu.vallegrande.foodcost.exception.service.InvalidFoodAmountException;
 import pe.edu.vallegrande.foodcost.model.FoodCost;
 import pe.edu.vallegrande.foodcost.repository.FoodCostsRepository;
 import pe.edu.vallegrande.foodcost.webclient.client.FoodClient;
