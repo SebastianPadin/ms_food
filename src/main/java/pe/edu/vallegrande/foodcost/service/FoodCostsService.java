@@ -13,6 +13,9 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class FoodCostsService {
 
+    public static final String RECORD_NOT_FOUND_MESSAGE = "Record not found";
+
+
     private final FoodCostsRepository foodCostsRepository;
 
     // Método para obtener costo de alimentos activos
@@ -33,7 +36,7 @@ public class FoodCostsService {
     // Método para eliminar un costo de alimento lógicamente
     public Mono<FoodCost> deleteFoodCost(Long id) {
         return foodCostsRepository.findById(id)
-                .switchIfEmpty(Mono.error(new FoodCostNotFoundException("Record not found")))
+                .switchIfEmpty(Mono.error(new FoodCostNotFoundException(RECORD_NOT_FOUND_MESSAGE)))
                 .flatMap(existingFoodCosts -> {
                     if ("A".equals(existingFoodCosts.getStatus())) {
                         existingFoodCosts.setStatus("I");
@@ -46,7 +49,7 @@ public class FoodCostsService {
     // Método para restaurar el costo de alimento (cambiar estado de 'I' a 'A')
     public Mono<FoodCost> restoreFoodCosts(Long id) {
         return foodCostsRepository.findById(id)
-                .switchIfEmpty(Mono.error(new FoodCostNotFoundException("Record not found")))
+                .switchIfEmpty(Mono.error(new FoodCostNotFoundException(RECORD_NOT_FOUND_MESSAGE)))
                 .flatMap(existingFoodCosts -> {
                     if ("I".equals(existingFoodCosts.getStatus())) {
                         existingFoodCosts.setStatus("A");
@@ -59,7 +62,7 @@ public class FoodCostsService {
     // Método para eliminar un costo de alimento físicamente
     public Mono<Void> deleteFoodCostPhysically(Long id) {
         return foodCostsRepository.findById(id)
-                .switchIfEmpty(Mono.error(new FoodCostNotFoundException("Record not found")))
+                .switchIfEmpty(Mono.error(new FoodCostNotFoundException(RECORD_NOT_FOUND_MESSAGE)))
                 .flatMap(existingFoodCost -> foodCostsRepository.deleteById(id));
     }
 }

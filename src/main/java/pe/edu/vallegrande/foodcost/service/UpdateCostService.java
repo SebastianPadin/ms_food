@@ -73,7 +73,7 @@ public class UpdateCostService {
 
     private void validateFoodAmount(Integer amount) {
         if (amount == null || BigDecimal.valueOf(amount).compareTo(BigDecimal.ZERO) == 0) {
-            throw new RuntimeException("❌ Cantidad inválida de alimento");
+            throw new InvalidFoodAmountException("❌ Cantidad inválida de alimento");
         }
     }
 

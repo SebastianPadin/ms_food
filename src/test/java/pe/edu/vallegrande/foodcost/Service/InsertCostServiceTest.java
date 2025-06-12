@@ -26,7 +26,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
-public class InsertCostServiceTest {
+class InsertCostServiceTest {
 
     @Mock
     private WebClient webClient;
@@ -60,7 +60,7 @@ public class InsertCostServiceTest {
     private WebClient.ResponseSpec hensResponseSpec;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         // Para el repositorio, stub para que al guardar retorne el objeto guardado
         lenient().when(foodCostsRepository.save(any(FoodCost.class)))
                 .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
@@ -71,7 +71,7 @@ public class InsertCostServiceTest {
      * Se espera que el flujo guarde dos registros (registro inicial y el siguiente).
      */
     @Test
-    public void testAddFoodCost_noExistingFoodCost() {
+    void testAddFoodCost_noExistingFoodCost() {
         // Datos falsos para FoodDto
         FoodDto foodDto = new FoodDto();
         foodDto.setIdFood(1L);
@@ -118,7 +118,7 @@ public class InsertCostServiceTest {
      * En este caso se guarda únicamente el nuevo registro (branch flatMap).
      */
     @Test
-    public void testAddFoodCost_existingFoodCost() {
+    void testAddFoodCost_existingFoodCost() {
         // Datos falsos para FoodDto
         FoodDto foodDto = new FoodDto();
         foodDto.setIdFood(1L);
@@ -169,7 +169,7 @@ public class InsertCostServiceTest {
      * Se espera que se emita un error controlado.
      */
     @Test
-    public void testAddFoodCost_invalidFoodAmount() {
+    void testAddFoodCost_invalidFoodAmount() {
         // Creamos FoodDto con cantidad inválida (cero)
         FoodDto foodDto = new FoodDto();
         foodDto.setIdFood(1L);
@@ -214,7 +214,7 @@ public class InsertCostServiceTest {
      * por no existir).
      */
     @Test
-    public void testAddFoodCost_hensNotFound() {
+    void testAddFoodCost_hensNotFound() {
         // Datos falsos para FoodDto
         FoodDto foodDto = new FoodDto();
         foodDto.setIdFood(1L);
