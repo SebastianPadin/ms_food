@@ -1,5 +1,6 @@
 package pe.edu.vallegrande.foodcost.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,17 +13,17 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-import org.springframework.beans.factory.annotation.Value;
+
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
-/**
- * Configura la seguridad del microservicio:
- * - Permite acceso sin token a Swagger
- * - Requiere JWT con roles USER/ADMIN para acceder a las rutas protegidas
- * - Configura CORS para permitir acceso desde el frontend
- */
 @Configuration
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
@@ -31,26 +32,25 @@ public class SecurityConfig {
     @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
     private String jwkSetUri;
 
+    private static final List<String> STATIC_ALLOWED_ORIGINS = Arrays.asList(
+            "http://localhost:4200"
+    );
+
+    private static final Pattern GITPOD_REGEX = Pattern.compile(
+            "^https://4200-[a-z0-9\\-]+\\.ws-[a-z0-9]+\\.gitpod\\.io$"
+    );
+
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(auth -> auth
-                        // Permitir preflight CORS sin token
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                        // Swagger (libre)
                         .pathMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
-
-                        // GET: accesible por USER y ADMIN
                         .pathMatchers(HttpMethod.GET, "/api/food-costs/**").hasAnyRole("USER", "ADMIN")
-
-                        // POST, PUT, DELETE: solo ADMIN
                         .pathMatchers(HttpMethod.POST, "/api/food-costs/**").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.PUT, "/api/food-costs/**").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.DELETE, "/api/food-costs/**").hasRole("ADMIN")
-
-                        // Todo lo demás requiere estar autenticado
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -59,16 +59,7 @@ public class SecurityConfig {
                                 .jwtAuthenticationConverter(this::convertJwt)
                         )
                 )
-                .cors(cors -> cors
-                        .configurationSource(exchange -> {
-                            var config = new org.springframework.web.cors.CorsConfiguration();
-                            config.setAllowCredentials(true);
-                            config.addAllowedOrigin("http://localhost:4200");
-                            config.addAllowedHeader("*");
-                            config.addAllowedMethod("*");
-                            return config;
-                        })
-                )
+                .cors(cors -> cors.configurationSource(dynamicCorsConfigurationSource()))
                 .build();
     }
 
@@ -83,5 +74,32 @@ public class SecurityConfig {
                 ? List.of(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()))
                 : List.of();
         return Mono.just(new CustomAuthenticationToken(jwt, authorities));
+    }
+
+    /**
+     * 🔄 Configuración dinámica de CORS para admitir localhost y Gitpod
+     */
+    private CorsConfigurationSource dynamicCorsConfigurationSource() {
+        return new UrlBasedCorsConfigurationSource() {
+            @Override
+            public CorsConfiguration getCorsConfiguration(ServerWebExchange exchange) {
+                String origin = exchange.getRequest().getHeaders().getOrigin();
+                if (isAllowedOrigin(origin)) {
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.setAllowedOrigins(List.of(origin));
+                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    config.setAllowedHeaders(List.of("*"));
+                    config.setAllowCredentials(true);
+                    config.setMaxAge(3600L);
+                    return config;
+                }
+                return null; // Origen no permitido
+            }
+        };
+    }
+
+    private boolean isAllowedOrigin(String origin) {
+        if (origin == null) return false;
+        return STATIC_ALLOWED_ORIGINS.contains(origin) || GITPOD_REGEX.matcher(origin).matches();
     }
 }
