@@ -5,8 +5,8 @@ spring:
   application:
     name: foods   
   r2dbc:
-    #url: ${DATABASE_URL}
-    url: r2dbc:pool:postgresql://postgres.axzbiriaypunthimexpq:foods2024%40vg@aws-0-us-east-1.pooler.supabase.com:6543/postgres
+    url: ${DATABASE_URL}
+    #url: r2dbc:pool:postgresql://postgres.axzbiriaypunthimexpq:foods2024%40vg@aws-0-us-east-1.pooler.supabase.com:6543/postgres
   security:
     oauth2:
       resourceserver:
