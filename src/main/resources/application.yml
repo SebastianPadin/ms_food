@@ -1,12 +1,20 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 spring:
   application:
     name: foods   
   r2dbc:
-    url: ${DATABASE_URL}
-    #url: r2dbc:pool:postgresql://postgres.axzbiriaypunthimexpq:foods2024%40vg@aws-0-us-east-1.pooler.supabase.com:6543/postgres
+    url: r2dbc:pool:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASS}
+    pool:
+      initial-size: 3
+      max-size: 15
+      max-idle-time: 20m
+      validation-query: SELECT 1
+      acquire-retry: 3
+      acquire-retry-delay: 5s
   security:
     oauth2:
       resourceserver:

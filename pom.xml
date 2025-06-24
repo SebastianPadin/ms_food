@@ -36,6 +36,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
+		<!-- R2DBC Pool -->
+		<dependency>
+			<groupId>io.r2dbc</groupId>
+			<artifactId>r2dbc-pool</artifactId>
+			<version>1.0.2.RELEASE</version>
+		</dependency>
 		<!-- Reactor Test -->
 		<dependency>
 			<groupId>io.projectreactor</groupId>
