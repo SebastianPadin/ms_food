@@ -6,16 +6,18 @@ spring:
     name: FoodCost
 
   r2dbc:
-    url: r2dbc:pool:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    url: ${DB_URL}
     username: ${DB_USER}
     password: ${DB_PASS}
     pool:
-      initial-size: 3
-      max-size: 15
-      max-idle-time: 20m
+      enabled: true
+      initial-size: 2
+      max-size: 10
+      max-idle-time: 30s
       validation-query: SELECT 1
       acquire-retry: 3
       acquire-retry-delay: 5s
+
   security:
     oauth2:
       resourceserver:
@@ -26,4 +28,3 @@ spring:
 api:
   food-service-url: ${FOOD_SERVICE_URL}
   hens-service-url: ${HENS_SERVICE_URL}
-  
