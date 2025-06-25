@@ -28,3 +28,9 @@ spring:
 api:
   food-service-url: ${FOOD_SERVICE_URL}
   hens-service-url: ${HENS_SERVICE_URL}
+
+logging:
+  level:
+    root: INFO
+    org.springframework.r2dbc: DEBUG
+    io.r2dbc: DEBUG
