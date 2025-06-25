@@ -3,7 +3,8 @@ server:
 
 spring:
   application:
-    name: foods   
+    name: foods
+
   r2dbc:
     url: ${DB_URL}
     username: ${DB_USER}
@@ -16,13 +17,20 @@ spring:
       validation-query: SELECT 1
       acquire-retry: 3
       acquire-retry-delay: 5s
+
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI}
-          jwk-set-uri: ${JWT_JWK_SET_URI}  
-   
+          jwk-set-uri: ${JWT_JWK_SET_URI}
+
+  logging:
+    level:
+      root: INFO
+      org.springframework.r2dbc: DEBUG
+      io.r2dbc: DEBUG
+
 
 
     
