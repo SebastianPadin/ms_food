@@ -25,11 +25,11 @@ spring:
           issuer-uri: ${JWT_ISSUER_URI}
           jwk-set-uri: ${JWT_JWK_SET_URI}
 
-  logging:
-    level:
-      root: INFO
-      org.springframework.r2dbc: DEBUG
-      io.r2dbc: DEBUG
+logging:
+  level:
+    root: INFO
+    org.springframework.r2dbc: DEBUG
+    io.r2dbc: DEBUG
 
 
 
