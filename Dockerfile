@@ -10,5 +10,5 @@ WORKDIR /app
 COPY --from=build /app/target/FoodCost-0.0.1-SNAPSHOT.jar app.jar
 
 # Render expone automáticamente el puerto 8080, asegúrate de usarlo
-EXPOSE 8080
+EXPOSE 8090
 ENTRYPOINT ["java", "-jar", "app.jar"]
